@@ -12,13 +12,6 @@ Level::Level()
 
 Level::~Level()
 {
-	// 메모리 해제.
-	//for (int ix = 0; ix < actors.Size(); ++ix)
-	//{
-	//	// 액터 삭제.
-	//	delete actors[ix];
-	//}
-
     // 메모리 해제.
     for (Actor* actor : actors)
     {
@@ -26,13 +19,13 @@ Level::~Level()
     }
 }
 
-void Level::AddActor(Actor* newActor)
+void Level::RequestAddActor(Actor* newActor)
 {
-    //actors.PushBack(newActor);
-    addRequestedActor = newActor;
+    // 액터 배열에 추가.
+    actors.PushBack(newActor);
 }
 
-void Level::ProcessAddedAndDestroyedActor()
+void Level::DestroyRequestedActors()
 {
     // 액터 순회 후 삭제 요청된 액터를 처리.
     for (int ix = 0; ix < actors.Size();)
@@ -47,22 +40,10 @@ void Level::ProcessAddedAndDestroyedActor()
 
         ++ix;
     }
-
-    // 추가 요청된 액터 처리.
-    if (addRequestedActor)
-    {
-        actors.PushBack(addRequestedActor);
-        addRequestedActor = nullptr;
-    }
 }
 
 void Level::Update(float deltaTime)
 {
-    //for (int ix = 0; ix < actors.Size(); ++ix)
-    //{
-    //    actors[ix]->Update(deltaTime);
-    //}
-
     // 레벨에 포함된 액터를 순회하면서 Update 함수 호출.
     for (Actor* actor : actors)
     {

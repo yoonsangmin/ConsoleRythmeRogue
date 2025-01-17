@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include  "Math/Vector2.h"
+#include "Container/List.h"
 
 #define BUFFER_SIZE 2
 
@@ -31,9 +32,23 @@ public:
     // 레벨 추가 함수.
     void LoadLevel(Level* newLevel);
 
-    // 액터 추가/삭제 함수.
-    void AddActor(Actor* newActor);
+    // 액터 추가 함수.
+    template<typename T, typename... Args>
+    inline Actor* SpawnActor(Args&&... args)
+    {
+        Actor* SpawnedActor = new T(std::forward<Args>(args)...);
+
+        // 추가 요청된 액터 처리.
+        addRequestedActors.PushBack(SpawnedActor);
+
+        return SpawnedActor;
+    }
+
+    // 액터 삭제 함수.
     void DestroyActor(Actor* targetActor);
+
+    // 프레임 마지막에 추가, 삭제 처리.
+    void ProcessAddedAndDestroyedActor();
 
     // 화면 좌표 관련 함수.
     void SetCursorType(CursorType cursorType);
@@ -94,8 +109,8 @@ protected:
     // 메인 레벨 변수.
     Level* mainLevel;
 
-    // 프레임 업데이트해야 하는지 여부를 나타내는 변수.
-    bool shouldUpdate = true;
+    // 추가 요청된 액터들.
+    List<Actor*> addRequestedActors;
 
 private:
 

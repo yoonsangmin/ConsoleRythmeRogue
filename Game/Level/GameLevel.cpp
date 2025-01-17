@@ -5,7 +5,7 @@
 GameLevel::GameLevel()
 {
     // 플레이어 생성.
-    AddActor(new Player(Vector2(0, 0), this));
+    Engine::Get().SpawnActor<Player>(Vector2(0, 0), this);
 }
 
 void GameLevel::Draw()

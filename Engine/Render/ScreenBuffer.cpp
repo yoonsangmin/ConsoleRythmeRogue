@@ -75,7 +75,7 @@ void ScreenBuffer::Draw(UTF_16_CHAR_INFO** charInfo)
 {
     for (int y = 0; y < size.Y; ++y)
     {
-        int count = 0;
+        short count = 0;
 
         // CHAR_INFO 래퍼 만들면 하나씩 이동해도 됨.
         for (int x = 0; x < size.X; ++x)
@@ -112,7 +112,7 @@ void ScreenBuffer::Draw(UTF_16_CHAR_INFO** charInfo)
 
         COORD bufferPosition = { 0, 0 };
         COORD bufferSize = { count, 1 };
-        SMALL_RECT writeRegion = { 0, y, size.X - 1, y };
+        SMALL_RECT writeRegion = { 0, (short)y, (short)size.X - 1, (short)y };
 
         // 한 줄씩 출력.
         WriteConsoleOutputW(buffer, horizontalBuffer, bufferSize, bufferPosition, &writeRegion);

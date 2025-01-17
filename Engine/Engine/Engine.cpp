@@ -86,6 +86,15 @@ Engine::~Engine()
     {
         delete renderTargets[ix];
     }
+
+    // 레벨에 아직 추가되지 않은 액터들 삭제.
+    for (Actor* actor : addRequestedActors)
+    {
+        if (!actor)
+        {
+            delete actor;
+        }
+    }
 }
 
 void Engine::Run()
@@ -118,15 +127,11 @@ void Engine::Run()
 		}
 
 		// 현재 프레임 시간 저장.
-		// currentTime = timeGetTime();
 		QueryPerformanceCounter(&time);
 		currentTime = time.QuadPart;
 
 		// 프레임 시간 계산.
 		float deltaTime = static_cast<float>(currentTime - previousTime) / static_cast<float>(frequency.QuadPart);
-
-        // 한 프레임 시간 계산.
-        //float targetOneFrameTime = 1.0f / targetFrameRate;
 
 		// 프레임 확인.
 		if (deltaTime >= targetOneFrameTime)
@@ -134,12 +139,8 @@ void Engine::Run()
 			// 입력 처리 (현재 키의 눌림 상태 확인).
 			ProcessInput();
 
-            // 업데이트 가능한 상태에서만 프레임 업데이트 처리.
-            if (shouldUpdate)
-            {
-			    Update(deltaTime);
-			    Draw();
-            }
+            Update(deltaTime);
+            Draw();
 
 			// 키 상태 저장.
 			SavePreviousKeyState();
@@ -147,14 +148,8 @@ void Engine::Run()
 			// 이전 프레임 시간 저장.
 			previousTime = currentTime;
             
-            // 액터 정리 (삭제 요청된 액터들 정리).
-            if (mainLevel)
-            {
-                mainLevel->ProcessAddedAndDestroyedActor();
-            }
-
-            // 프레임 활성화.
-            shouldUpdate = true;
+            // 액터 정리 (삭제 요청된 액터들 정리), 레벨에 추가.
+            ProcessAddedAndDestroyedActor();
 		}
 	}
 }
@@ -167,30 +162,31 @@ void Engine::LoadLevel(Level* newLevel)
     mainLevel = newLevel;
 }
 
-void Engine::AddActor(Actor* newActor)
-{
-    // 예외 처리.
-    if (mainLevel == nullptr)
-    {
-        return;
-    }
-
-    // 레벨에 액터 추가.
-    shouldUpdate = false;
-    mainLevel->AddActor(newActor);
-}
-
 void Engine::DestroyActor(Actor* targetActor)
 {
+    // 액터 제거(비활성화).
+    targetActor->Destroy();
+}
+
+void Engine::ProcessAddedAndDestroyedActor()
+{
     // 예외 처리.
-    if (mainLevel == nullptr)
+    if (!mainLevel)
     {
         return;
     }
 
-    // 레벨에 액터 제거.
-    shouldUpdate = false;
-    targetActor->Destroy();
+    mainLevel->DestroyRequestedActors();
+    
+    // 레벨에 액터 추가.
+    for (int ix = 0; ix < addRequestedActors.Size();)
+    {
+        mainLevel->RequestAddActor(addRequestedActors[ix]);
+        addRequestedActors[ix] = nullptr;
+        addRequestedActors.Erase(ix);
+
+        ++ix;
+    }
 }
 
 void Engine::SetCursorType(CursorType cursorType)
@@ -226,6 +222,7 @@ void Engine::Draw(const Vector2& position, const wchar_t* image, Color color)
 void Engine::SetTargetFrameRate(float targetFrameRate)
 {
     this->targetFrameRate = targetFrameRate;
+    // 한 프레임 시간 계산.
     targetOneFrameTime = 1.0f / targetFrameRate;
 }
 
