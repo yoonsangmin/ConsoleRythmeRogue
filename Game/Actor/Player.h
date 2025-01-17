@@ -9,7 +9,7 @@ class Player : public DrawableActor
     RTTI_DECLARATIONS(Player, DrawableActor)
 
 public:
-    Player(const Vector2& position, GameLevel* level);
+    Player(const Vector2& position, const wchar_t* str, int drawOrder, GameLevel* level);
 
 private:
     // 게임 레벨을 참조하는 변수.

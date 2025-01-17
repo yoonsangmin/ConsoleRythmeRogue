@@ -37,6 +37,7 @@ protected:
     Vector2 position;
 
 	// ID(해시 - 실제로는) /이름 값.
+
 	// 활성화 상태인지를 나타내는 변수.
 	bool isActive;
 

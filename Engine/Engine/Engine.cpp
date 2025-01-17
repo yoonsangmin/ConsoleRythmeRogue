@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include <Windows.h>
 #include <iostream>
+#include <limits>
 
 #include "Level/Level.h"
 #include "Actor/Actor.h"
@@ -39,16 +40,19 @@ Engine::Engine()
     // 타겟 프레임 속도 설정.
     SetTargetFrameRate(60.0f);
 
-    // 화면 그릴 때 사용할 문자 버퍼 초기화.
+    // 화면 그릴 때 사용할 문자 버퍼, 순서 버퍼 초기화.
     imageBuffer = new UTF_16_CHAR_INFO* [screenSize.x];
+    orderBuffer = new int* [screenSize.x];
     
     for (int ix = 0; ix < screenSize.x; ++ix)
     {
         imageBuffer[ix] = new UTF_16_CHAR_INFO[screenSize.y];
+        orderBuffer[ix] = new int[screenSize.y];
+        std::memset(orderBuffer[ix], std::numeric_limits<int>::lowest(), screenSize.y * sizeof(int));
     }
 
     // 버퍼 초기화.
-    ClearImageBuffer();
+    ClearImageBufferAndOrderBuffer();
 
     // 두 개의 버퍼 생성 (버퍼를 번갈아 사용하기 위해-더블 버퍼링).
     COORD size = { (short)screenSize.x, (short)screenSize.y };
@@ -194,28 +198,86 @@ void Engine::SetCursorType(CursorType cursorType)
     GetRenderer()->SetCursorType(cursorType);
 }
 
-void Engine::Draw(const Vector2& position, const wchar_t* image, Color color)
+void Engine::Draw(const Vector2& position, const wchar_t* image, Color color, int drawOrder)
 {
+    bool isPervious4Byte = false;
+
     for (int ix = 0; ix < (int)wcslen(image); ++ix)
     {
-        // 잘못된 위치인지 확인.
         int x = position.x;
         int y = position.y;
 
-        if (x >= 0 && x < screenSize.x && y >= 0 && y < screenSize.y)
+        bool is4Byte = Is4ByteUTF16(image[ix]);
+
+        // 이전 문자가 4바이트 문자였으면 스킵.
+        if (isPervious4Byte)
         {
-            // 방금 확인한 문자가 4바이트 UTF-16 문자인 경우 같이 넣어주고 넘어가기.
-            if (Is4ByteUTF16(image[ix]))
+            isPervious4Byte = is4Byte;
+            continue;
+        }
+
+        // 잘못된 위치인지 확인.
+        if (x < 0 || x >= screenSize.x || y < 0 || y >= screenSize.y)
+        {
+            isPervious4Byte = is4Byte;
+            continue;
+        }
+
+        // 현재 그릴 곳에 그림이 있는 경우 스킵.
+        if (orderBuffer[x][y] > drawOrder)
+        {
+            isPervious4Byte = is4Byte;
+            continue;
+        }
+
+        int px = position.x - 1;
+
+        // 앞의 문자가 전각인 경우.
+        if (px >= 0 && IsFullWidthCharacter(imageBuffer[px][y].data->Char.UnicodeChar))
+        {
+            // 내가 가려지는 경우.
+            if (orderBuffer[px][y] > drawOrder)
             {
-                wchar_t str[2] = { image[ix], image[ix + 1] };
-                imageBuffer[x][y].SetData(str, (unsigned long)color);
-                ++ix;
+                orderBuffer[x][y] = drawOrder;
+                isPervious4Byte = is4Byte;
+                continue;
             }
-            else
+            // 내가 기존 문자를 가리는 경우.
+            // 앞의 문자를 확인에서 제외시키기 위해 초기화.
+            imageBuffer[px][y].SetData(L' ', 0);
+        }
+
+        int nx = position.x + 1;
+
+        // 내가 전각 문자인 경우.
+        if (IsFullWidthCharacter(image[ix]) && nx < screenSize.x)
+        {
+            // 내가 가려지는 경우.
+            if (orderBuffer[nx][y] > drawOrder)
             {
-                imageBuffer[x][y].SetData(image[ix], (unsigned long)color);
+                orderBuffer[x][y] = drawOrder;
+                isPervious4Byte = is4Byte;
+                continue;
             }
-        }       
+            // 내가 다음 문자를 가리는 경우.
+            orderBuffer[nx][y] = drawOrder;
+            // 다음 문자를 확인에서 제외시키기 위해 초기화.
+            imageBuffer[nx][y].SetData(L' ', 0);
+        }
+
+        // 확인하고 있는 문자가 4바이트 UTF-16 문자인 경우 같이 넣어주고 넘어가기.
+        if (is4Byte)
+        {
+            wchar_t str[2] = { image[ix], image[ix + 1] };
+            imageBuffer[x][y].SetData(str, (unsigned long)color);
+        }
+        else
+        {
+            imageBuffer[x][y].SetData(image[ix], (unsigned long)color);
+        }
+
+        orderBuffer[x][y] = drawOrder;
+        isPervious4Byte = is4Byte;
     }
 }
 
@@ -276,7 +338,8 @@ void Engine::Draw()
     Clear();
 
     // 사용자가 변경한 콘솔 설정 동기화.
-    SyncConsoleBufferSettings(renderTargets[currentRenderTargetIndex], renderTargets[frontBufferIndex]);
+    //SyncConsoleBufferSettings(renderTargets[currentRenderTargetIndex], renderTargets[frontBufferIndex]);
+    //SyncConsoleBufferSettings(renderTargets[frontBufferIndex], renderTargets[currentRenderTargetIndex]);
 
     // 레벨 그리기
     if (mainLevel != nullptr)
@@ -293,8 +356,9 @@ void Engine::Draw()
 
 void Engine::Clear()
 {
-    ClearImageBuffer();
-    GetRenderer()->Clear();
+    ClearImageBufferAndOrderBuffer();
+    //TODO: 버퍼를 통째로 그리고 있기 때문에 필요 없을 것 같음. 삭제해도 되는지 확인 필요.
+    // GetRenderer()->Clear();
 }
 
 void Engine::SavePreviousKeyState()
@@ -313,19 +377,21 @@ void Engine::Present()
     currentRenderTargetIndex = (currentRenderTargetIndex + 1) % BUFFER_SIZE;
 }
 
-void Engine::ClearImageBuffer()
+void Engine::ClearImageBufferAndOrderBuffer()
 {
-    // 버퍼 덮어쓰기.
     for (int y = 0; y < screenSize.y; ++y)
     {
-        // 버퍼 덮어쓰기.
         for (int x = 0; x < screenSize.x; ++x)
         {
+            // 버퍼 덮어쓰기.
             imageBuffer[x][y].SetData(L' ', 0);
+            // 깊이 버퍼 초기화
+            orderBuffer[x][y] = std::numeric_limits<int>::lowest();
         }
     }
 }
 
+// 잘 작동하지 않음...
 void Engine::SyncConsoleBufferSettings(HANDLE sourceBuffer, HANDLE targetBuffer)
 {
     // 색상 및 속성 복사.

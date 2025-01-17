@@ -2,8 +2,8 @@
 #include "DrawableActor.h"
 #include "Engine/Engine.h"
 
-DrawableActor::DrawableActor(const wchar_t* image)
-    : Actor()/*, image(image)*/
+DrawableActor::DrawableActor(const wchar_t* image, int drawOrder, bool isVisible)
+    : Actor(), drawOrder(drawOrder), isVisible(isVisible)
 {
     // 전달받은 문자열 복사.
     auto length = wcslen(image) + 1;
@@ -21,9 +21,14 @@ DrawableActor::~DrawableActor()
 
 void DrawableActor::Draw()
 {
+    if (!isVisible)
+    {
+        return;
+    }
+
     Super::Draw();
 
-    Engine::Get().Draw(position, image, color);
+    Engine::Get().Draw(position, image, color, drawOrder);
 }
 
 void DrawableActor::SetPosition(const Vector2& newPosition)

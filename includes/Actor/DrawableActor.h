@@ -8,7 +8,7 @@ class ENGINE_API DrawableActor : public Actor
     RTTI_DECLARATIONS(DrawableActor, Actor)
 
 public:
-    DrawableActor(const wchar_t* image = L"");
+    DrawableActor(const wchar_t* image = L"", int drawOrder = 0, bool isVisible = true);
     virtual ~DrawableActor();
 
     virtual void Draw() override;
@@ -17,8 +17,10 @@ public:
     // 충돌 확인 함수.
     bool Intersect(const DrawableActor& other);
 
-    // Getter.
+    // Getter/Setter.
     inline int Width() const { return width; }
+    inline bool IsVisible() const { return isVisible; }
+    inline void SetVisible(bool value) { isVisible = value; }
 
 protected:
 
@@ -27,6 +29,12 @@ protected:
 
     // 너비(문자열 길이, 전각 반각 고려).
     int width = 0;
+
+    // 그려야 하는 순서.
+    int drawOrder = 0;
+
+    // 화면 표시 여부.
+    bool isVisible = true;;
 
     // 색상 값.
     Color color = Color::White;

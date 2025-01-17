@@ -54,7 +54,7 @@ public:
     // 화면 좌표 관련 함수.
     void SetCursorType(CursorType cursorType);
 
-    void Draw(const Vector2& position, const wchar_t* image, Color color = Color::White);
+    void Draw(const Vector2& position, const wchar_t* image, Color color = Color::White, int drawOrder = 0);
 
     // 화면 크기 반환 함수.
     inline Vector2 ScreenSize() const { return screenSize; }
@@ -87,7 +87,7 @@ private:
     // 더블 버퍼링 구현.
     inline ScreenBuffer* GetRenderer() const { return renderTargets[currentRenderTargetIndex]; }
     void Present();                 // 버퍼 교체
-    void ClearImageBuffer();					// 화면 지우기.
+    void ClearImageBufferAndOrderBuffer();					// 화면 지우기.
     void SyncConsoleBufferSettings(HANDLE sourceBuffer, HANDLE targetBuffer);   // 버퍼 정보 동기화
 
 protected:
@@ -122,6 +122,8 @@ private:
     // 화면 지울 때 사용할 버퍼(Buffer/Blob).
     // UTF-16 서로게이트 페어를 생각해서 x를 2배로 잡음. 그릴 때는 2씩 커지면서 그리기.
     struct UTF_16_CHAR_INFO** imageBuffer = nullptr;
+    // 그리는 순서 버퍼.
+    int** orderBuffer = nullptr;
 
     // 화면 버퍼.
     ScreenBuffer* renderTargets[BUFFER_SIZE];
