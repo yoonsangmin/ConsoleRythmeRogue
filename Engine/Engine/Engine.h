@@ -36,12 +36,12 @@ public:
     //void AddActor(Actor* newActor);
     
     template<typename T, typename... Args>
-    inline Actor* SpawnActor()// Args&&... args)
+    inline Actor* SpawnActor(Args&&... args)
     {
-        Actor* SpawnedActor = new T();// Args&&... args);
+        Actor* SpawnedActor = new T(std::forward<Args>(args)...);
 
         // 추가 요청된 액터 처리.
-        addRequestedActors->PushBack(SpawnedActor);
+        addRequestedActors.PushBack(SpawnedActor);
 
         return SpawnedActor;
     }
