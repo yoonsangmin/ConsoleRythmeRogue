@@ -27,4 +27,16 @@ public:
 
 private:
     float tickTimer = 0;
+
+    // 게임 화면 공간.
+    Vector2 gameScreen[2];
+
+    // UI 스크린.
+    float uiScreenRatio = 0.2f;
+    Vector2 uiScreen[2];
+
+    // 비트 표시 스크린.
+    float beatScreenRatio = 0.07f;
+    Vector2 beatScreen[2];
+
 };

@@ -7,6 +7,24 @@ GameLevel::GameLevel(float tickPerSecond)
 {
     // 플레이어 생성.
     Engine::Get().SpawnActor<Player>(this, L"😊", Vector2(1, 0));
+
+    // 공간 나누기.
+    Vector2 screenSize = Engine::Get().ScreenSize();
+    int tempX, tempY;
+    
+    // 비트 스크린. - 아래쪽.
+    tempY = (int)((screenSize.y - 1) * (1 - beatScreenRatio));
+    beatScreen[0] = { 0, tempY + 1 };
+    beatScreen[1] = { screenSize.x - 1, screenSize.y - 1 };
+
+    // UI 스크린. - 오른쪽.
+    tempX = (int)((screenSize.x - 1) * (1 - uiScreenRatio));
+    uiScreen[0] = { tempX + 1, 0 };
+    uiScreen[1] = { screenSize.x - 1, tempY };
+
+    // 게임 스크린.
+    gameScreen[0] = { 0, 0 };
+    gameScreen[1] = { tempX, tempY };
 }
 
 void GameLevel::Update(float deltaTime)
@@ -24,4 +42,17 @@ void GameLevel::Update(float deltaTime)
 void GameLevel::Draw()
 {
     Super::Draw();
+
+    // 비트 표시하기.
+    for (int y = beatScreen[0].y; y < beatScreen[1].y; ++y)
+    {
+        int x = (int)(tickTimer / tickPerSecond * (beatScreen[1].x - 1) / 2);
+        int reverseX = beatScreen[1].x - 1 - x;
+
+        Engine::Get().Draw(Vector2(x, y), L"｜");
+        Engine::Get().Draw(Vector2(x, y), L"｜");
+
+        Engine::Get().Draw(Vector2(reverseX, y), L"｜");
+        Engine::Get().Draw(Vector2(reverseX, y), L"｜");
+    }
 }

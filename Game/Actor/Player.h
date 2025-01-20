@@ -16,8 +16,9 @@ public:
 private:
     
     // 입력 허용 범위. 0.5를 넘으면 안 됨.
-    float inputTolerance = 0.02f;
-    Vector2 inputToleranceRange;
+    float inputTolerance = 0.2f;
+    float inputToleranceRangeX;
+    float inputToleranceRangeY;
 
     // 이동 후 비활성화, 이후 다음 틱에 이동 가능.
     bool canMove = true;

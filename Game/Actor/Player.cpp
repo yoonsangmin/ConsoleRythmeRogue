@@ -5,8 +5,8 @@
 Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
     : RythmeActor(level, str, position, hp, drawOrder, color)
 {
-    inputToleranceRange.x = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
-    inputToleranceRange.y = refLevel->tickPerSecond * inputTolerance;
+    inputToleranceRangeX = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
+    inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;
 }
 
 void Player::Update(float deltaTime)
@@ -21,9 +21,10 @@ void Player::Update(float deltaTime)
 
     // 리듬에 맞춰 이동.
     float halfTPS = refLevel->tickPerSecond / 2;
+    float tickTimer = refLevel->GetTickTimer();
     if (canMove 
-        && ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() >= inputToleranceRange.x )
-        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() <= inputToleranceRange.y)))
+        && ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() >= inputToleranceRangeX)
+        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() <= inputToleranceRangeY)))
     {
         // 동시에 반대 방향이 눌린 경우 무시.
         if (!Engine::Get().GetKeyDown(VK_RIGHT) || !Engine::Get().GetKeyDown(VK_LEFT))
@@ -55,8 +56,8 @@ void Player::Update(float deltaTime)
         }
     }
     // 틱이 지난 후. 이동 가능하도록 함.
-    else if ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRange.x)
-        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRange.y))
+    else if ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRangeX)
+        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRangeY))
     {
         canMove = true;
     }
