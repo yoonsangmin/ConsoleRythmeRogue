@@ -10,7 +10,7 @@ public:
     Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, int ticksPerMove = 2, int drawOrder = 0, const Color& color = Color::Red);
     ~Enemy();
 
-    virtual void Update(float deltaTime) override;
+    virtual void Tick(float deltaTime) override;
 
 protected:
     // 이동 방법 결정. 상속받은 적들 마다 다르게 구현.

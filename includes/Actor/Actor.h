@@ -21,7 +21,7 @@ public:
 	virtual ~Actor();
 
 	// 루프 처리 함수.
-	virtual void Update(float deltaTime);
+	virtual void Tick(float deltaTime);
 	virtual void Draw();
 
     // Getter/Setter.

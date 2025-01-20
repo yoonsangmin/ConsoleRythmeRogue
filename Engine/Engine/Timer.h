@@ -10,7 +10,7 @@ public:
     Timer(float targetTime);
 
     // 타이머 업데이트.
-    void Update(float deltaTime);
+    void Tick(float deltaTime);
 
     // 타이머 초기화.
     void Reset();

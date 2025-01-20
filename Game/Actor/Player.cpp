@@ -9,9 +9,9 @@ Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, in
     inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;
 }
 
-void Player::Update(float deltaTime)
+void Player::Tick(float deltaTime)
 {
-    Super::Update(deltaTime);
+    Super::Tick(deltaTime);
 
     // ESC 종료.
     if (Engine::Get().GetKeyDown(VK_ESCAPE))

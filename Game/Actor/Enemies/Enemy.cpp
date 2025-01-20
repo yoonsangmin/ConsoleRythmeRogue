@@ -16,9 +16,9 @@ Enemy::~Enemy()
     delete[] name;
 }
 
-void Enemy::Update(float deltaTime)
+void Enemy::Tick(float deltaTime)
 {
-    Super::Update(deltaTime);
+    Super::Tick(deltaTime);
 
     // 시간이 줄어들면 틱이 됨.
     if (refLevel->GetTickTimer() < previousTimer)

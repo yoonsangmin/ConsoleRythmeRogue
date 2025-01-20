@@ -77,7 +77,7 @@ protected:
 	void ProcessInput();			// 입력 처리.
 	void SavePreviousKeyState();
 
-	void Update(float deltaTime);	// Tick();
+	void Tick(float deltaTime);	// Tick();
 	void Draw();					// Render();
 
     void Clear();

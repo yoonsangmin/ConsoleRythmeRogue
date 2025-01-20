@@ -11,7 +11,7 @@ class Player : public RythmeActor
 public:
     Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 0, const Color& color = Color::White);
 
-    virtual void Update(float deltaTime) override;
+    virtual void Tick(float deltaTime) override;
 
 private:
     

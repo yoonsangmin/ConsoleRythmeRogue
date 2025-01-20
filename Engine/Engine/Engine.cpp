@@ -118,7 +118,7 @@ void Engine::Run()
 	QueryPerformanceCounter(&time);
 
 	int64_t currentTime = time.QuadPart;
-	//previousTime = currentTime으로 설정하면 첫 프레임에 Update가 스킵됨.
+	//previousTime = currentTime으로 설정하면 첫 프레임이 스킵됨.
 	int64_t previousTime = currentTime;
 
 	// Game-Loop.
@@ -143,7 +143,7 @@ void Engine::Run()
 			// 입력 처리 (현재 키의 눌림 상태 확인).
 			ProcessInput();
 
-            Update(deltaTime);
+            Tick(deltaTime);
             Draw();
 
 			// 키 상태 저장.
@@ -323,12 +323,12 @@ void Engine::ProcessInput()
 	}
 }
 
-void Engine::Update(float deltaTime)
+void Engine::Tick(float deltaTime)
 {
     // 레벨 업데이트.
     if (mainLevel != nullptr)
     {
-        mainLevel->Update(deltaTime);
+        mainLevel->Tick(deltaTime);
     }
 }
 

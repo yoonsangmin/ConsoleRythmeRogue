@@ -6,7 +6,7 @@ Timer::Timer(float targetTime)
 {
 }
 
-void Timer::Update(float deltaTime)
+void Timer::Tick(float deltaTime)
 {
     elapsedTime += deltaTime;
 }

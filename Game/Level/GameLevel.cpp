@@ -31,9 +31,9 @@ GameLevel::GameLevel(float tickPerSecond)
     gameScreen[1] = { tempX, tempY };
 }
 
-void GameLevel::Update(float deltaTime)
+void GameLevel::Tick(float deltaTime)
 {
-    Super::Update(deltaTime);
+    Super::Tick(deltaTime);
 
     tickTimer += deltaTime;
 
