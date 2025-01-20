@@ -8,7 +8,7 @@ class ENGINE_API DrawableActor : public Actor
     RTTI_DECLARATIONS(DrawableActor, Actor)
 
 public:
-    DrawableActor(const wchar_t* image = L"", int drawOrder = 0, bool isVisible = true);
+    DrawableActor(const wchar_t* image = L"", const Vector2& position = Vector2(0, 0), int drawOrder = 0, const Color& color = Color::White);
     virtual ~DrawableActor();
 
     virtual void Draw() override;
@@ -34,7 +34,7 @@ protected:
     int drawOrder = 0;
 
     // 화면 표시 여부.
-    bool isVisible = true;;
+    bool isVisible = true;
 
     // 색상 값.
     Color color = Color::White;

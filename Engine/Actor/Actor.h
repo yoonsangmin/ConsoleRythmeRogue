@@ -17,7 +17,7 @@ class ENGINE_API Actor : public RTTI
     friend class Level;
 
 public:
-	Actor();
+	Actor(const Vector2& position = Vector2(0, 0));
 	virtual ~Actor();
 
 	// 루프 처리 함수.

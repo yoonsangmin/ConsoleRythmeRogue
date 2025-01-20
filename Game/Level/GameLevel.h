@@ -10,10 +10,15 @@ class GameLevel : public Level
     RTTI_DECLARATIONS(GameLevel, Level)
 
 public:
-    GameLevel();
+    GameLevel(float tickPerSecond = 500);
 
+    virtual void Update(float deltaTime) override;
     virtual void Draw() override;
 
 private:
-
+    // 120BPM - 1초에 2비트, 0.5초에 1비트.
+    const float tickPerSecond;
+    float tickTimer = 0;
+    int ticks = 0;
+    const int ticksPerBeat = 4;
 };

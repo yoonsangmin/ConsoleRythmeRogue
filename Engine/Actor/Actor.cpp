@@ -1,8 +1,8 @@
 ﻿#include "PreCompiledHeader.h"
 #include "Actor.h"
 
-Actor::Actor()
-	: isActive(true), isExpired(false)
+Actor::Actor(const Vector2& position)
+	: isActive(true), isExpired(false), position(position)
 {
 }
 

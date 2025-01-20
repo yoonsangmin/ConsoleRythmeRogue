@@ -2,8 +2,8 @@
 #include "DrawableActor.h"
 #include "Engine/Engine.h"
 
-DrawableActor::DrawableActor(const wchar_t* image, int drawOrder, bool isVisible)
-    : Actor(), drawOrder(drawOrder), isVisible(isVisible)
+DrawableActor::DrawableActor(const wchar_t* image, const Vector2& position, int drawOrder, const Color& color)
+    : Actor(position), drawOrder(drawOrder), color(color), isVisible(true)
 {
     // 전달받은 문자열 복사.
     auto length = wcslen(image) + 1;

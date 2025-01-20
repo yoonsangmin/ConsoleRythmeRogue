@@ -1,17 +1,16 @@
 ﻿#pragma once
 
-#include <Actor/DrawableActor.h>
+#include "Actor/RythmeActor.h"
 
 // 게임 레벨 전방 선언.
 class GameLevel;
-class Player : public DrawableActor
+class Player : public RythmeActor
 {
-    RTTI_DECLARATIONS(Player, DrawableActor)
+    RTTI_DECLARATIONS(Player, RythmeActor)
 
 public:
-    Player(const Vector2& position, const wchar_t* str, int drawOrder, GameLevel* level);
+    Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 0, const Color& color = Color::White);
 
 private:
-    // 게임 레벨을 참조하는 변수.
-    GameLevel* refLevel = nullptr;
+
 };
