@@ -21,8 +21,7 @@ void Player::Update(float deltaTime)
 
     // 리듬에 맞춰 이동.
     float halfTPS = refLevel->tickPerSecond / 2;
-    float tickTimer = refLevel->GetTickTimer();
-    if (canMove 
+    if (canMove
         && ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() >= inputToleranceRangeX)
         || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() <= inputToleranceRangeY)))
     {
@@ -40,8 +39,9 @@ void Player::Update(float deltaTime)
                 canMove = false;
             }
         }
-
-        if (!Engine::Get().GetKeyDown(VK_DOWN) || !Engine::Get().GetKeyDown(VK_UP))
+        
+        // 좌우로 이동했으면 이동 불가.
+        if (canMove && (!Engine::Get().GetKeyDown(VK_DOWN) || !Engine::Get().GetKeyDown(VK_UP)))
         {
             if (Engine::Get().GetKeyDown(VK_DOWN))
             {
@@ -55,7 +55,7 @@ void Player::Update(float deltaTime)
             }
         }
     }
-    // 틱이 지난 후. 이동 가능하도록 함.
+    // 틱이 지난 후. 이동 가능하도록 플래그 업데이트.
     else if ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRangeX)
         || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRangeY))
     {

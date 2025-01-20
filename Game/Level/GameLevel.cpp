@@ -1,12 +1,16 @@
 ﻿#include "GameLevel.h"
 #include "Actor/Player.h"
+#include "Actor/Enemies/Enemy.h"
 #include "Engine/Engine.h"
 
 GameLevel::GameLevel(float tickPerSecond)
     : tickPerSecond(tickPerSecond)
 {
     // 플레이어 생성.
-    Engine::Get().SpawnActor<Player>(this, L"😊", Vector2(1, 0));
+    Engine::Get().SpawnActor<Player>(this, L"😊", Vector2(12, 10));
+
+    // 적 생성 테스트.
+    Engine::Get().SpawnActor<Enemy>(this, "박쥐", L"🦇", Vector2(10, 10));
 
     // 공간 나누기.
     Vector2 screenSize = Engine::Get().ScreenSize();

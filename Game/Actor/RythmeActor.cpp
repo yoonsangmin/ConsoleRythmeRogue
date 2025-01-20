@@ -12,7 +12,7 @@ RythmeActor::RythmeActor(GameLevel* level, const wchar_t* str, const Vector2& po
     }
 }
 
-bool RythmeActor::Move(EDirection::Flag direction, int amount)
+bool RythmeActor::Move(EDirection::Flags direction)
 {
     int nextX = position.x, nextY = position.y;
 

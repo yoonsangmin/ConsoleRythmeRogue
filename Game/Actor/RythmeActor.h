@@ -4,7 +4,7 @@
 
 struct EDirection
 {
-    typedef unsigned int Flags;
+    typedef uint32_t Flags;
     enum Flag
     {
         None = 0,
@@ -13,11 +13,53 @@ struct EDirection
         South = 1 << 2,
         North = 1 << 3,
 
-        NE = North || East,
-        NW = North || West,
         SE = South || East,
         SW = South || West,
+        NE = North || East,
+        NW = North || West,
     };
+
+    inline static Flags Random8Direction()
+    {
+        switch (Random(0, 7))
+        {
+        case 0:
+            return East;
+        case 1:
+            return West;
+        case 2:
+            return South;
+        case 3:
+            return North;
+        case 4:
+            return SE;
+        case 5:
+            return SW;
+        case 6:
+            return NE;
+        case 7:
+            return NW;
+        }
+
+        return East;
+    }
+
+    inline static Flags Random4Direction()
+    {
+        switch (Random(0, 3))
+        {
+        case 0:
+            return East;
+        case 1:
+            return West;
+        case 2:
+            return South;
+        case 3:
+            return North;
+        }
+
+        return East;
+    }
 };
 
 // 게임 레벨 전방 선언.
@@ -34,16 +76,13 @@ public:
 protected:
     
     // 이동 함수.
-    bool Move(EDirection::Flag direction, int amount = 1);
+    bool Move(EDirection::Flags direction);
 
     bool CanMove(int x, int y);
 
 protected:
     // 체력.
     int hp;
-
-    // 이동 가능한 틱의 번호.
-    int tick = 4;
 
     // 게임 레벨을 참조하는 변수.
     GameLevel* refLevel = nullptr;

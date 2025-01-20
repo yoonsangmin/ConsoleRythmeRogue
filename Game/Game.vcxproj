@@ -167,12 +167,20 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\Enemies\ChasingEnemy.cpp" />
+    <ClCompile Include="Actor\Enemies\Enemy.cpp" />
+    <ClCompile Include="Actor\Enemies\PatrollingEnemy.cpp" />
+    <ClCompile Include="Actor\Enemies\StationaryEnemy.cpp" />
     <ClCompile Include="Actor\Player.cpp" />
     <ClCompile Include="Actor\RythmeActor.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\Enemies\ChasingEnemy.h" />
+    <ClInclude Include="Actor\Enemies\Enemy.h" />
+    <ClInclude Include="Actor\Enemies\PatrollingEnemy.h" />
+    <ClInclude Include="Actor\Enemies\StationaryEnemy.h" />
     <ClInclude Include="Actor\Player.h" />
     <ClInclude Include="Actor\RythmeActor.h" />
     <ClInclude Include="Level\GameLevel.h" />

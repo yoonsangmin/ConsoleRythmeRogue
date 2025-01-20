@@ -38,6 +38,52 @@ void SafeDelete(T* pointer)
     }
 }
 
+// UTF-16 유니코드 관련.
+// 유니코드 블록 범위를 나타내는 구조체
+struct UnicodeBlock
+{
+    uint32_t start;
+    uint32_t end;
+};
+
+// 이모지가 포함된 유니코드 블록 목록.
+const UnicodeBlock emojiBlocks[] =
+{
+    {0x1F600, 0x1F64F}, // Emoticons
+    {0x1F300, 0x1F5FF}, // Miscellaneous Symbols and Pictographs
+    {0x1F680, 0x1F6FF}, // Transport and Map Symbols
+    {0x1F700, 0x1F77F}, // Alchemical Symbols
+    {0x1F780, 0x1F7FF}, // Geometric Shapes Extended
+    {0x1F800, 0x1F8FF}, // Supplemental Arrows-C
+    {0x1F900, 0x1F9FF}, // Supplemental Symbols and Pictographs
+    {0x1FA00, 0x1FA6F}, // Chess Symbols
+    {0x1FA70, 0x1FAFF}, // Symbols and Pictographs Extended-A
+    {0x2600, 0x26FF},   // Miscellaneous Symbols
+    {0x2700, 0x27BF},   // Dingbats
+    // 필요한 경우 추가 블록을 여기에 포함
+};
+
+// 주어진 코드 포인트가 이모지 블록에 속하는지 확인하는 함수.
+inline bool IsEmojiCodePoint(uint32_t codePoint)
+{
+    for (const auto& block : emojiBlocks)
+    {
+        if (codePoint >= block.start && codePoint <= block.end) 
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// UTF-16 코드 유닛 두 개로부터 코드 포인트를 계산하는 함수.
+inline uint32_t GetCodePoint(wchar_t highSurrogate, wchar_t lowSurrogate) 
+{
+    return (static_cast<uint32_t>(highSurrogate) - 0xD800) * 0x400 +
+        (static_cast<uint32_t>(lowSurrogate) - 0xDC00) + 0x10000;
+}
+
 // 전각 문자 범위: U+FF01 ~ U+FF5E.
 inline bool IsFullWidth(wchar_t c1) 
 {
@@ -50,11 +96,22 @@ inline bool IsCJK(wchar_t c1)
     return (c1 >= 0x4E00 && c1 <= 0x9FFF);
 }
 
-// 이모지 범위: U+1F600 ~ U+1F64F.
-inline bool IsEmoji(wchar_t c1, wchar_t c2) 
+// 주어진 wchar_t 문자가 이모지인지 확인하는 함수.
+inline bool IsEmoji(wchar_t c1, wchar_t c2 = 0) 
 {
-    uint32_t codePoint = (static_cast<uint32_t>(c1) - 0xD800) * 0x400 + (static_cast<uint32_t>(c2) - 0xDC00) + 0x10000;
-    return (codePoint >= 0x1F600 && codePoint <= 0x1F64F);
+    uint32_t codePoint;
+    if (c1 >= 0xD800 && c1 <= 0xDBFF && c2 >= 0xDC00 && c2 <= 0xDFFF) 
+    {
+        // 서러게이트 페어인 경우
+        codePoint = GetCodePoint(c1, c2);
+    }
+    else 
+    {
+        // 단일 유닛인 경우
+        codePoint = static_cast<uint32_t>(c1);
+    }
+
+    return IsEmojiCodePoint(codePoint);
 }
 
 // 문자 유형 확인 함수.
