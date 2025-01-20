@@ -23,6 +23,9 @@ void Level::RequestAddActor(Actor* newActor)
 {
     // 액터 배열에 추가.
     actors.PushBack(newActor);
+
+    // 레벨에 추가될 때 BeginPlay 실행.
+    newActor->BeginPlay();
 }
 
 void Level::DestroyRequestedActors()

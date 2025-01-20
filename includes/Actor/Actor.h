@@ -20,6 +20,9 @@ public:
 	Actor(const Vector2& position = Vector2(0, 0));
 	virtual ~Actor();
 
+    // 시작 시 한 번 불리는 함수.
+    virtual void BeginPlay();
+
 	// 루프 처리 함수.
 	virtual void Tick(float deltaTime);
 	virtual void Draw();

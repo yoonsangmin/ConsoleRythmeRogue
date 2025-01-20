@@ -160,7 +160,7 @@ void Engine::Run()
 
 void Engine::LoadLevel(Level* newLevel)
 {
-    // 기존 레벨이 있다면 삭제 후 교체.
+    //TODO: 기존 레벨이 있다면 삭제 후 교체.
 
     // 메인 레벨 설정.
     mainLevel = newLevel;
@@ -183,13 +183,11 @@ void Engine::ProcessAddedAndDestroyedActor()
     mainLevel->DestroyRequestedActors();
     
     // 레벨에 액터 추가.
-    for (int ix = 0; ix < addRequestedActors.Size();)
+    while (addRequestedActors.Size() > 0)
     {
-        mainLevel->RequestAddActor(addRequestedActors[ix]);
-        addRequestedActors[ix] = nullptr;
-        addRequestedActors.Erase(ix);
-
-        ++ix;
+        mainLevel->RequestAddActor(addRequestedActors[0]);
+        addRequestedActors[0] = nullptr;
+        addRequestedActors.Erase(0);
     }
 }
 
