@@ -15,11 +15,9 @@ void GameLevel::Update(float deltaTime)
 
     tickTimer += deltaTime;
 
-    if (tickTimer >= tickPerSecond)
+    if (tickTimer > tickPerSecond)
     {
         tickTimer -= tickPerSecond;
-        ++ticks;
-        ticks %= ticksPerBeat;
     }
 }
 

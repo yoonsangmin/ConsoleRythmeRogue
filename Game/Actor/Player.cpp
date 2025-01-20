@@ -5,4 +5,59 @@
 Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
     : RythmeActor(level, str, position, hp, drawOrder, color)
 {
+    inputToleranceRange.x = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
+    inputToleranceRange.y = refLevel->tickPerSecond * inputTolerance;
+}
+
+void Player::Update(float deltaTime)
+{
+    Super::Update(deltaTime);
+
+    // ESC 종료.
+    if (Engine::Get().GetKeyDown(VK_ESCAPE))
+    {
+        Engine::Get().QuitGame();
+    }
+
+    // 리듬에 맞춰 이동.
+    float halfTPS = refLevel->tickPerSecond / 2;
+    if (canMove 
+        && ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() >= inputToleranceRange.x )
+        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() <= inputToleranceRange.y)))
+    {
+        // 동시에 반대 방향이 눌린 경우 무시.
+        if (!Engine::Get().GetKeyDown(VK_RIGHT) || !Engine::Get().GetKeyDown(VK_LEFT))
+        {
+            if (Engine::Get().GetKeyDown(VK_RIGHT))
+            {
+                Move(EDirection::East);
+                canMove = false;
+            }
+            else if (Engine::Get().GetKeyDown(VK_LEFT))
+            {
+                Move(EDirection::West);
+                canMove = false;
+            }
+        }
+
+        if (!Engine::Get().GetKeyDown(VK_DOWN) || !Engine::Get().GetKeyDown(VK_UP))
+        {
+            if (Engine::Get().GetKeyDown(VK_DOWN))
+            {
+                Move(EDirection::South);
+                canMove = false;
+            }
+            else if (Engine::Get().GetKeyDown(VK_UP))
+            {
+                Move(EDirection::North);
+                canMove = false;
+            }
+        }
+    }
+    // 틱이 지난 후. 이동 가능하도록 함.
+    else if ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRange.x)
+        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRange.y))
+    {
+        canMove = true;
+    }
 }
