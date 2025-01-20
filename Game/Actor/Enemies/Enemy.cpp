@@ -9,6 +9,7 @@ Enemy::Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vecto
     this->name = new char[length];
     strcpy_s(this->name, length, name);
 
+    collision = ECollision::Enemy;
 }
 
 Enemy::~Enemy()

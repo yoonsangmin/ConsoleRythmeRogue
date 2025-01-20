@@ -3,9 +3,8 @@
 #include "Core.h"
 #include "RTTI.h"
 #include "Container/List.h"
+#include "Actor/Actor.h"
 
-// 전방 선언(forward Declaration).
-class Actor;
 class ENGINE_API Level : public RTTI
 {
     // RTTI 정의.
@@ -14,6 +13,20 @@ class ENGINE_API Level : public RTTI
 public:
 	Level();
 	virtual ~Level();
+
+    // 액터 찾기.
+    template<typename T>
+    inline void FindAllActors(List<T*>& out)
+    {
+        for (int ix = 0; ix < actors.Size(); ++ix)
+        {
+            T* actor = actors[ix]->As<T>();
+            if (actor && actors[ix]->IsActive())
+            {
+                out.PushBack(actor);
+            }
+        }
+    }
 
 	// 액터 추가 함수.
 	void RequestAddActor(Actor* newActor);

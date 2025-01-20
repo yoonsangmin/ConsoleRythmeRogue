@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Actor/DrawableActor.h"
+#include "Actor/Actor.h"
 
 struct EDirection
 {
@@ -13,10 +13,10 @@ struct EDirection
         South = 1 << 2,
         North = 1 << 3,
 
-        SE = South || East,
-        SW = South || West,
-        NE = North || East,
-        NW = North || West,
+        SE = South | East,
+        SW = South | West,
+        NE = North | East,
+        NW = North | West,
     };
 
     inline static Flags Random8Direction()
@@ -64,9 +64,9 @@ struct EDirection
 
 // 게임 레벨 전방 선언.
 class GameLevel;
-class RythmeActor : public DrawableActor
+class RythmeActor : public Actor
 {
-    RTTI_DECLARATIONS(RythmeActor, DrawableActor)
+    RTTI_DECLARATIONS(RythmeActor, Actor)
 
 public:
     // 생성자
@@ -81,6 +81,7 @@ protected:
     bool CanMove(int x, int y);
 
 protected:
+
     // 체력.
     int hp;
 

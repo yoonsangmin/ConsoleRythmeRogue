@@ -7,6 +7,8 @@ Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, in
 {
     inputToleranceRangeX = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
     inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;
+
+    collision = ECollision::Player;
 }
 
 void Player::Tick(float deltaTime)

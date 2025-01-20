@@ -18,9 +18,6 @@
     <ClCompile Include="Engine\Engine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Actor.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -30,7 +27,7 @@
     <ClCompile Include="Math\Vector2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\DrawableActor.cpp">
+    <ClCompile Include="Actor\Actor.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Timer.cpp">
@@ -42,9 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor\Actor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Level\Level.h">
@@ -65,7 +59,7 @@
     <ClInclude Include="Math\Vector2.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\DrawableActor.h">
+    <ClInclude Include="Actor\Actor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Timer.h">

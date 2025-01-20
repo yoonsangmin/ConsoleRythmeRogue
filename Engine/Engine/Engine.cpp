@@ -60,7 +60,7 @@ Engine::Engine()
     {
         renderTargets[ix] = new ScreenBuffer(size);
         renderTargets[ix]->SetCursorType(CursorType::NoCursor);
-        renderTargets[ix]->SetConsoleFontSize(12);
+        renderTargets[ix]->SetConsoleFontSize(16);
     }
 
     // 스왑 버퍼.
@@ -144,6 +144,7 @@ void Engine::Run()
 			ProcessInput();
 
             Tick(deltaTime);
+            CheckCollision();
             Draw();
 
 			// 키 상태 저장.
@@ -330,12 +331,50 @@ void Engine::Tick(float deltaTime)
     }
 }
 
+void Engine::CheckCollision()
+{
+    List<Actor*> actors;
+    mainLevel->FindAllActors<Actor>(actors);
+
+    int ix = 0;
+    int size = actors.Size();
+    List<Actor*> staticActors;
+    // 필터링.
+    while (ix < size)
+    {
+        // 충돌 처리 안 하는 경우 제외.
+        if (!actors[ix]->IsCollisionEnabled())
+        {
+            // 선택 정렬.
+            Actor* temp = actors[ix];
+            actors[ix] = actors[size - 1];
+            actors[size - 1] = temp;
+            --size;
+            continue;
+        }
+
+        // 스태틱 액터인 경우 - 따로 처리하기 위해서 다른 변수에 저장.
+        if (actors[ix]->IsStatic())
+        {
+            // 선택 정렬.
+            Actor* temp = actors[ix];
+            actors[ix] = actors[size - 1];
+            actors[size - 1] = temp;
+            staticActors.PushBack(temp);
+            --size;
+            continue;
+        }
+
+        ++ix;
+    }
+}
+
 void Engine::Draw()
 {
     // 화면 지우기.
     Clear();
 
-    // 사용자가 변경한 콘솔 설정 동기화.
+    //TODO: 사용자가 변경한 콘솔 설정 동기화.
     //SyncConsoleBufferSettings(renderTargets[currentRenderTargetIndex], renderTargets[frontBufferIndex]);
     //SyncConsoleBufferSettings(renderTargets[frontBufferIndex], renderTargets[currentRenderTargetIndex]);
 

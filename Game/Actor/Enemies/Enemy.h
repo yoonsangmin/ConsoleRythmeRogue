@@ -17,6 +17,7 @@ protected:
     virtual void DecideDirection();
 
 protected:
+
     // 이름.
     char* name;
 
