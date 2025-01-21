@@ -13,10 +13,10 @@ struct ECollision
         None = -1,
         Player = 0,
         Wall = 1,
-        Enemy,
-        Effect,
-        Money,
-        Item,
+        Enemy = 2,
+        Effect = 3,
+        Item = 4,
+        Door = 5,
         Max = 6
     };
 
@@ -43,22 +43,22 @@ struct ECollision
 private:
     // 충돌 매트릭스.
     static constexpr bool CollisionMatrix[Max][Max] = {
-        {false, true,  true,  false,  false,  false},     // Player는 Wall, Enemy와 충돌.
+        {false, true,  true,  false,  false,  true},      // Player는 Wall, Enemy, Door와 충돌.
         {true,  false, true,  false,  false,  false},     // Wall는 Player, Enemy와 충돌.
         {true,  true,  false, false,  false,  false},     // Enemy는 Wall, Player와 충돌.
         {false,  false,  false,  false, false,  false},   // Effect는 아무것도 충돌하지 않음.
-        {false,  false,  false,  false,  false, false},   // Money는 아무것도 충돌하지 않음.
-        {false,  false,  false,  false,  false,  false}   // Item은 아무것도 충돌하지 않음.
+        {false,  false,  false,  false,  false, false},   // Item는 아무것도 충돌하지 않음.
+        {true,  false,  true,  false,  false,  false}     // Door는 Player, Enemy와 충돌.
     };
 
     // 오버랩 매트릭스.
-    static constexpr bool OverlapMatrix[6][6] = {
-        {false, false, false, false, false, false},     // Player는 아무것도 오버랩하지 않음.
+    static constexpr bool OverlapMatrix[Max][Max] = {
+        {false, false, false, false, true, false},      // Player는 Item와 오버랩.
         {false, false, false, false, false, false},     // Wall은 아무것도 오버랩하지 않음.
         {false, false, false, true,  false,  false},    // Enemy는 Effect와 오버랩.
         {false, false, true,  false, false, false},     // Effect는 Enemy와 오버랩.
-        {true,  false, false,  false,  false, false},   // Money는 Player와 오버랩.
-        {true,  false, false, false,  false, false}     // Item은 Player와 오버랩.
+        {true,  false, false,  false,  false, false},   // Item은 Player와 오버랩.
+        {false,  false, false, false,  false, false}    // Door는 아무것도 오버랩하지 않음.
     };
 };
 

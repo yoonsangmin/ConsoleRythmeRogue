@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include "Engine/Engine.h"
 #include "Level/GameLevel.h"
+#include "Actor/Maps/Stair.h"
 
 Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
     : RythmeActor(level, str, position, hp, drawOrder, color)
@@ -8,6 +9,7 @@ Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, in
     inputToleranceRangeX = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
     inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;
 
+    overlapEnabled = true;
     collisionType = ECollision::Player;
 }
 
@@ -62,5 +64,14 @@ void Player::Tick(float deltaTime)
         || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRangeY))
     {
         canMove = true;
+    }
+}
+
+void Player::OnBeginOverlap(const Actor& other)
+{
+    if (other.As<Stair>())
+    {
+        // 방 내려가기 구현.
+        SetPosition(Vector2(0, 0));
     }
 }

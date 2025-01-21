@@ -378,7 +378,8 @@ void Engine::CheckCollision()
         for (int jx = 0; jx < staticActors.Size(); ++jx)
         {
             // 충돌 가능하면 인터섹트 연산.
-            if (ECollision::CanCollide(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
+            if (staticActors[jx]->IsCollisionEnabled() &&
+                ECollision::CanCollide(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
                 movableActors[ix]->Intersect(*staticActors[jx]))
             {
                 movableActors[ix]->OnCollisionHit(*staticActors[jx]);
@@ -407,7 +408,8 @@ void Engine::CheckCollision()
             }
 
             // 충돌 가능하면 인터섹트 연산.
-            if (ECollision::CanCollide(movableActors[ix]->GetCollisionType(), movableActors[jx]->GetCollisionType()) &&
+            if (movableActors[jx]->IsCollisionEnabled() &&
+                ECollision::CanCollide(movableActors[ix]->GetCollisionType(), movableActors[jx]->GetCollisionType()) &&
                 movableActors[ix]->Intersect(*movableActors[jx]))
             {
                 movableActors[ix]->OnCollisionHit(*movableActors[jx]);
@@ -440,7 +442,29 @@ void Engine::CheckCollision()
         movableActors[ix]->ApplyMovement();
     }
 
-    // 오버랩 처리.
+    // 스태틱 오버랩 처리.
+    for (int ix = 0; ix < staticActors.Size(); ++ix)
+    {
+        // 오버랩 비활성화 시 무시.
+        if (!staticActors[ix]->IsOverlapEnabled())
+        {
+            continue;
+        }
+
+        // 무버블 검사.
+        for (int jx = 0; jx < movableActors.Size(); ++jx)
+        {
+            if (ECollision::CanOverlap(staticActors[ix]->GetCollisionType(), movableActors[jx]->GetCollisionType()) &&
+                staticActors[ix]->Intersect(*movableActors[jx]))
+            {
+                staticActors[ix]->AddNewOverlapActor(movableActors[jx]);
+            }
+        }
+
+        staticActors[ix]->ProcessNewOverlapActors();
+    }
+
+    // 무버블 오버랩 처리.
     for (int ix = 0; ix < movableActors.Size(); ++ix)
     {
         // 오버랩 비활성화 시 무시.
@@ -449,6 +473,17 @@ void Engine::CheckCollision()
             continue;
         }
 
+        // 스태틱 검사.
+        for (int jx = 0; jx < staticActors.Size(); ++jx)
+        {
+            if (ECollision::CanOverlap(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
+                movableActors[ix]->Intersect(*staticActors[jx]))
+            {
+                movableActors[ix]->AddNewOverlapActor(staticActors[jx]);
+            }
+        }
+
+        // 무버블 검사.
         for (int jx = 0; jx < movableActors.Size(); ++jx)
         {
             // 자기 자신은 무시.
@@ -461,15 +496,6 @@ void Engine::CheckCollision()
                 movableActors[ix]->Intersect(*movableActors[jx]))
             {
                 movableActors[ix]->AddNewOverlapActor(movableActors[jx]);
-            }
-        }
-
-        for (int jx = 0; jx < staticActors.Size(); ++jx)
-        {
-            if (ECollision::CanOverlap(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
-                movableActors[ix]->Intersect(*staticActors[jx]))
-            {
-                movableActors[ix]->AddNewOverlapActor(staticActors[jx]);
             }
         }
 

@@ -9,9 +9,11 @@ class Player : public RythmeActor
     RTTI_DECLARATIONS(Player, RythmeActor)
 
 public:
-    Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 0, const Color& color = Color::White);
+    Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 10, const Color& color = Color::White);
 
     virtual void Tick(float deltaTime) override;
+
+    virtual void OnBeginOverlap(const Actor& other) override;
 
 private:
     

@@ -13,10 +13,39 @@
 // 색상 열거형.
 enum class Color : unsigned short
 {
+    // 텍스트 색상
+    Black = 0,
     Red = FOREGROUND_RED,
     Green = FOREGROUND_GREEN,
     Blue = FOREGROUND_BLUE,
-    White = Red + Green + Blue
+    Yellow = FOREGROUND_RED | FOREGROUND_GREEN,
+    Magenta = FOREGROUND_RED | FOREGROUND_BLUE,
+    Cyan = FOREGROUND_GREEN | FOREGROUND_BLUE,
+    White = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+    BrightRed = FOREGROUND_RED | FOREGROUND_INTENSITY,
+    BrightGreen = FOREGROUND_GREEN | FOREGROUND_INTENSITY,
+    BrightBlue = FOREGROUND_BLUE | FOREGROUND_INTENSITY,
+    BrightYellow = Yellow | FOREGROUND_INTENSITY,
+    BrightMagenta = Magenta | FOREGROUND_INTENSITY,
+    BrightCyan = Cyan | FOREGROUND_INTENSITY,
+    BrightWhite = White | FOREGROUND_INTENSITY,
+
+    // 배경색
+    BgBlack = 0,
+    BgRed = BACKGROUND_RED,
+    BgGreen = BACKGROUND_GREEN,
+    BgBlue = BACKGROUND_BLUE,
+    BgYellow = BACKGROUND_RED | BACKGROUND_GREEN,
+    BgMagenta = BACKGROUND_RED | BACKGROUND_BLUE,
+    BgCyan = BACKGROUND_GREEN | BACKGROUND_BLUE,
+    BgWhite = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
+    BrightBgRed = BACKGROUND_RED | BACKGROUND_INTENSITY,
+    BrightBgGreen = BACKGROUND_GREEN | BACKGROUND_INTENSITY,
+    BrightBgBlue = BACKGROUND_BLUE | BACKGROUND_INTENSITY,
+    BrightBgYellow = BgYellow | BACKGROUND_INTENSITY,
+    BrightBgMagenta = BgMagenta | BACKGROUND_INTENSITY,
+    BrightBgCyan = BgCyan | BACKGROUND_INTENSITY,
+    BrightBgWhite = BgWhite | BACKGROUND_INTENSITY,
 };
 
 // 커서의 종류를 설정할 때 사용할 열거형.
@@ -60,6 +89,7 @@ const UnicodeBlock emojiBlocks[] =
     {0x1FA70, 0x1FAFF}, // Symbols and Pictographs Extended-A
     {0x2600, 0x26FF},   // Miscellaneous Symbols
     {0x2700, 0x27BF},   // Dingbats
+    { 0xD83D, 0xDEAA }, // Door
     // 필요한 경우 추가 블록을 여기에 포함
 };
 

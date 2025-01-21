@@ -171,6 +171,11 @@
     <ClCompile Include="Actor\Enemies\Enemy.cpp" />
     <ClCompile Include="Actor\Enemies\PatrollingEnemy.cpp" />
     <ClCompile Include="Actor\Enemies\StationaryEnemy.cpp" />
+    <ClCompile Include="Actor\Maps\Corridor.cpp" />
+    <ClCompile Include="Actor\Maps\Door.cpp" />
+    <ClCompile Include="Actor\Maps\Floor.cpp" />
+    <ClCompile Include="Actor\Maps\Stair.cpp" />
+    <ClCompile Include="Actor\Maps\Wall.cpp" />
     <ClCompile Include="Actor\Player.cpp" />
     <ClCompile Include="Actor\RythmeActor.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
@@ -181,6 +186,12 @@
     <ClInclude Include="Actor\Enemies\Enemy.h" />
     <ClInclude Include="Actor\Enemies\PatrollingEnemy.h" />
     <ClInclude Include="Actor\Enemies\StationaryEnemy.h" />
+    <ClInclude Include="Actor\Maps\Corridor.h" />
+    <ClInclude Include="Actor\Maps\Door.h" />
+    <ClInclude Include="Actor\Maps\Floor.h" />
+    <ClInclude Include="Actor\Maps\Map.h" />
+    <ClInclude Include="Actor\Maps\Stair.h" />
+    <ClInclude Include="Actor\Maps\Wall.h" />
     <ClInclude Include="Actor\Player.h" />
     <ClInclude Include="Actor\RythmeActor.h" />
     <ClInclude Include="Level\GameLevel.h" />
