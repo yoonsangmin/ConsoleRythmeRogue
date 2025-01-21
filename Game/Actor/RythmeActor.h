@@ -76,9 +76,7 @@ public:
 protected:
     
     // 이동 함수.
-    bool Move(EDirection::Flags direction);
-
-    bool CanMove(int x, int y);
+    void Move(EDirection::Flags direction);
 
 protected:
 

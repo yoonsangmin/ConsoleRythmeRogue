@@ -45,6 +45,19 @@ public:
         size++;
     }
 
+    bool Contains(const T& value) const
+    {
+        for (int ix = 0; ix < size; ++ix)
+        {
+            if (data[ix] == value)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void Erase(int index)
     {
         // 예외 처리.
@@ -63,6 +76,19 @@ public:
         --size;
     }
 
+    void Clear()
+    {
+        if (data != nullptr)
+        {
+            delete[] data;
+        }
+        
+        size = 0;
+        capacity = 2;
+        data = new T[capacity];
+        memset(data, 0, sizeof(T) * capacity);
+    }
+
     int Size() const
     {
         return size;
@@ -71,6 +97,48 @@ public:
     int Capacity() const
     {
         return capacity;
+    }
+
+    // 복사 대입 연산자.
+    List& operator=(const List& other)
+    {
+        // 자기 대입 방지.
+        if (this != &other)
+        {
+            // 기존 데이터 삭제.
+            delete[] data;
+
+            // 새로 할당하고 데이터 복사.
+            size = other.size;
+            capacity = other.capacity;
+            data = new T[capacity];
+
+            memcpy(data, other.data, sizeof(T) * capacity);
+        }
+
+        return *this;
+    }
+
+    // 이동 대입 연산자.
+    List& operator=(List&& other)
+    {
+        // 자기 대입 방지.
+        if (this != &other)
+        {
+            // 기존 데이터 삭제.
+            delete[] data;
+
+            // 다른 객체의 데이터로 이동.
+            data = other.data;
+            size = other.size;
+            capacity = other.capacity;
+
+            // 이동된 객체 초기화.
+            other.data = nullptr;
+            other.Clear();
+        }
+
+        return *this;
     }
 
     const T& operator[](int index) const
@@ -118,7 +186,8 @@ private:
             size = newCapacity;
         }
 
-        memcpy(newBlock, data, sizeof(T) * capacity);
+        //memcpy(newBlock, data, sizeof(T) * capacity);
+        memcpy(newBlock, data, sizeof(T) * size);
         //for (int ix = 0; ix < size; ++ix)
         //{
         //    // newBlock[ix] = data[ix];

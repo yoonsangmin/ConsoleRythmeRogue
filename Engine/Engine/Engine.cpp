@@ -336,36 +336,132 @@ void Engine::CheckCollision()
     List<Actor*> actors;
     mainLevel->FindAllActors<Actor>(actors);
 
-    int ix = 0;
-    int size = actors.Size();
+    List<Actor*> movableActors;
     List<Actor*> staticActors;
+    List<Actor*> noCollisionActors;
+
     // 필터링.
-    while (ix < size)
+    for (int ix = 0; ix < actors.Size(); ++ix)
     {
-        // 충돌 처리 안 하는 경우 제외.
-        if (!actors[ix]->IsCollisionEnabled())
+        // 충돌과 오버랩 처리를 모두 안 하는 경우.
+        if (!actors[ix]->IsCollisionEnabled() && !actors[ix]->IsOverlapEnabled())
         {
-            // 선택 정렬.
-            Actor* temp = actors[ix];
-            actors[ix] = actors[size - 1];
-            actors[size - 1] = temp;
-            --size;
+            noCollisionActors.PushBack(actors[ix]);
             continue;
         }
 
-        // 스태틱 액터인 경우 - 따로 처리하기 위해서 다른 변수에 저장.
+        // 스태틱 액터인 경우.
         if (actors[ix]->IsStatic())
         {
-            // 선택 정렬.
-            Actor* temp = actors[ix];
-            actors[ix] = actors[size - 1];
-            actors[size - 1] = temp;
-            staticActors.PushBack(temp);
-            --size;
+            staticActors.PushBack(actors[ix]);
             continue;
         }
 
-        ++ix;
+        movableActors.PushBack(actors[ix]);
+    }
+
+    // staticActors 충돌 처리.
+    for (int ix = 0; ix < movableActors.Size(); ++ix)
+    {
+        for (int jx = 0; jx < staticActors.Size(); ++jx)
+        {
+            // 충돌 가능하면 인터섹트 연산.
+            if (ECollision::CanCollide(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
+                movableActors[ix]->Intersect(*staticActors[jx]))
+            {
+                movableActors[ix]->OnCollisionHit(*staticActors[jx]);
+                staticActors[jx]->OnCollisionHit(*movableActors[ix]);
+
+                movableActors[ix]->RestorePosition();
+            }
+        }
+    }
+
+    // 충돌 처리.
+    for (int ix = 0; ix < movableActors.Size(); ++ix)
+    {
+        // 각 프레임에서 충돌 발생 여부를 추적.
+        bool collisionOccurred = false;
+        // 이동 중인 상태 체크. - 무한 루프 방지.
+        bool isMoving = movableActors[ix]->IsMoving();
+
+        // movableActors 충돌 처리.
+        for (int jx = 0; jx < movableActors.Size(); ++jx)
+        {
+            // 자신은 무시.
+            if (ix == jx)
+            {
+                continue;
+            }
+
+            // 충돌 가능하면 인터섹트 연산.
+            if (ECollision::CanCollide(movableActors[ix]->GetCollisionType(), movableActors[jx]->GetCollisionType()) &&
+                movableActors[ix]->Intersect(*movableActors[jx]))
+            {
+                movableActors[ix]->OnCollisionHit(*movableActors[jx]);
+                movableActors[jx]->OnCollisionHit(*movableActors[ix]);
+
+                // 충돌이 발생했음을 기록.
+                collisionOccurred = true;
+
+                // 위치 되돌리기.
+                if (isMoving)
+                {
+                    movableActors[ix]->RestorePosition();
+                    // 위치 변경 발생. 루프 다시 처기하기 위해 탈출.
+                    break;
+                }
+            }
+        }
+
+        // 충돌이 발생했고 액터의 위치가 복원된 경우 다른 액터들에 대해 다시 처리해야 함.
+        if (collisionOccurred && isMoving)
+        {
+            // -1로 설정하여 루프가 끝날 때 ++ix가 0부터 시작되도록 함.
+            ix = -1;
+        }
+    }
+
+    // movableActors 이동 처리.
+    for (int ix = 0; ix < movableActors.Size(); ++ix)
+    {
+        movableActors[ix]->ApplyMovement();
+    }
+
+    // 오버랩 처리.
+    for (int ix = 0; ix < movableActors.Size(); ++ix)
+    {
+        // 오버랩 비활성화 시 무시.
+        if (!movableActors[ix]->IsOverlapEnabled())
+        {
+            continue;
+        }
+
+        for (int jx = 0; jx < movableActors.Size(); ++jx)
+        {
+            // 자기 자신은 무시.
+            if (ix == jx)
+            {
+                continue;
+            }
+
+            if (ECollision::CanOverlap(movableActors[ix]->GetCollisionType(), movableActors[jx]->GetCollisionType()) &&
+                movableActors[ix]->Intersect(*movableActors[jx]))
+            {
+                movableActors[ix]->AddNewOverlapActor(movableActors[jx]);
+            }
+        }
+
+        for (int jx = 0; jx < staticActors.Size(); ++jx)
+        {
+            if (ECollision::CanOverlap(movableActors[ix]->GetCollisionType(), staticActors[jx]->GetCollisionType()) &&
+                movableActors[ix]->Intersect(*staticActors[jx]))
+            {
+                movableActors[ix]->AddNewOverlapActor(staticActors[jx]);
+            }
+        }
+
+        movableActors[ix]->ProcessNewOverlapActors();
     }
 }
 

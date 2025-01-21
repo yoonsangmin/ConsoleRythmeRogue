@@ -28,6 +28,6 @@ protected:
     int tickCount = 0;
     const int ticksPerMove;
 
-    EDirection::Flags moveDirection;
+    EDirection::Flags moveDirection = EDirection::East;
 
 };

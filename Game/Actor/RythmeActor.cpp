@@ -5,17 +5,19 @@ RythmeActor::RythmeActor(GameLevel* level, const wchar_t* str, const Vector2& po
     : Actor(str, position, true, drawOrder, color), refLevel(level), hp(hp)
 {
     // x 축은 짝수 칸에만 설정할 수 있도록 함.
-    if (this->position.x % 2 == 1)
+    if (Position().x % 2 == 1)
     {
-        this->position.x -= 1;
+        this->WarpPosition(Vector2(Position().x - 1, Position().y));
     }
 
-    collision = ECollision::Wall;
+    SetCollisionEnabled(true);
+    SetMovable(true);
+    collisionType = ECollision::Wall;
 }
 
-bool RythmeActor::Move(EDirection::Flags direction)
+void RythmeActor::Move(EDirection::Flags direction)
 {
-    int nextX = position.x, nextY = position.y;
+    int nextX = Position().x, nextY = Position().y;
 
     if (direction & EDirection::East)
     {
@@ -34,21 +36,6 @@ bool RythmeActor::Move(EDirection::Flags direction)
         --nextY;
     }
 
-    // 이동 가능한지 확인.
-    if (CanMove(nextX, nextY))
-    {
-        position.x = nextX;
-        position.y = nextY;
-
-        return true;
-    }
-
-    return false;
-}
-
-bool RythmeActor::CanMove(int x, int y)
-{
-    //TODO: 충돌 처리만 해주면 됨.
-
-    return true;
+    // 이동.
+    SetPosition(Vector2(nextX, nextY));
 }

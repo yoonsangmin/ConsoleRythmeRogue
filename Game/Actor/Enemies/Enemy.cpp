@@ -9,7 +9,7 @@ Enemy::Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vecto
     this->name = new char[length];
     strcpy_s(this->name, length, name);
 
-    collision = ECollision::Enemy;
+    collisionType = ECollision::Enemy;
 }
 
 Enemy::~Enemy()
@@ -45,5 +45,6 @@ void Enemy::Tick(float deltaTime)
 
 void Enemy::DecideDirection()
 {
-    moveDirection = EDirection::Random8Direction();
+    // moveDirection = EDirection::Random8Direction();
+    moveDirection = EDirection::East;
 }
