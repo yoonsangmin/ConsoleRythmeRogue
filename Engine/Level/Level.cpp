@@ -45,6 +45,11 @@ void Level::DestroyRequestedActors()
     }
 }
 
+void Level::BeginPlay()
+{
+    isInitialized = true;
+}
+
 void Level::Tick(float deltaTime)
 {
     // 레벨에 포함된 액터를 순회하면서 Tick 함수 호출.

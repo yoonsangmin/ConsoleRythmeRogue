@@ -165,6 +165,10 @@ void Engine::LoadLevel(Level* newLevel)
 
     // 메인 레벨 설정.
     mainLevel = newLevel;
+    if (!mainLevel->IsInitialized())
+    {
+        mainLevel->BeginPlay();
+    }   
 }
 
 void Engine::DestroyActor(Actor* targetActor)

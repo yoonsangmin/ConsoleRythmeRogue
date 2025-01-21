@@ -12,6 +12,7 @@ class GameLevel : public Level
 public:
     GameLevel(float tickPerSecond = 0.75f);
 
+    virtual void BeginPlay() override;
     virtual void Tick(float deltaTime) override;
     virtual void Draw() override;
 

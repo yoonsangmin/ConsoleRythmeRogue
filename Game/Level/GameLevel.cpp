@@ -18,12 +18,12 @@ GameLevel::GameLevel(float tickPerSecond)
     // 적 생성 테스트.
     Engine::Get().SpawnActor<Enemy>(this, "박쥐", L"🦇", Vector2(10, 10));
 
-    // 맵 생성 테스트.
-    Engine::Get().SpawnActor<Wall>(Vector2(20, 12));
-    Engine::Get().SpawnActor<Door>(Vector2(18, 12));
-    Engine::Get().SpawnActor<Floor>(Vector2(16, 12));
-    Engine::Get().SpawnActor<Corridor>(Vector2(14, 12));
-    Engine::Get().SpawnActor<Stair>(Vector2(12, 12));
+    //// 맵 생성 테스트.
+    //Engine::Get().SpawnActor<Wall>(Vector2(20, 12));
+    //Engine::Get().SpawnActor<Door>(Vector2(18, 12));
+    //Engine::Get().SpawnActor<Floor>(Vector2(16, 12));
+    //Engine::Get().SpawnActor<Corridor>(Vector2(14, 12));
+    //Engine::Get().SpawnActor<Stair>(Vector2(12, 12));
 
     // 공간 나누기.
     Vector2 screenSize = Engine::Get().ScreenSize();
@@ -42,6 +42,13 @@ GameLevel::GameLevel(float tickPerSecond)
     // 게임 스크린.
     gameScreen[0] = { 0, 0 };
     gameScreen[1] = { tempX, tempY };
+}
+
+void GameLevel::BeginPlay()
+{
+    Super::BeginPlay();
+
+    Map map(gameScreen[0], gameScreen[1], 20, Vector2(20, 8));
 }
 
 void GameLevel::Tick(float deltaTime)

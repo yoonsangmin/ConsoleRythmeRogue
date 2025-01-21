@@ -34,12 +34,20 @@ public:
     // 삭제 요청이 된 액터를 정리하는 함수.
     void DestroyRequestedActors();
 
+    // 로드 시 호출.
+    virtual void BeginPlay();
+
 	// 루프 처리 함수.
 	virtual void Tick(float deltaTime);
 	virtual void Draw();
 
+    inline bool IsInitialized() const { return isInitialized; }
+
 protected:
     //게임 공간에 배치되는 물체(액터) 배열.
     List<Actor*> actors;
+
+private:
+    bool isInitialized = false;
 
 };
