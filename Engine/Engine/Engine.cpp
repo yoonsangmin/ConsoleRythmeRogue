@@ -200,19 +200,31 @@ void Engine::SetCursorType(CursorType cursorType)
 void Engine::Draw(const Vector2& position, const wchar_t* image, Color color, int drawOrder)
 {
     bool isPervious4Byte = false;
+    int x = position.x;
+    int y = position.y;
+    int nextX = position.x;
 
     for (int ix = 0; ix < (int)wcslen(image); ++ix)
     {
-        int x = position.x;
-        int y = position.y;
+        x = nextX;
 
         bool is4Byte = Is4ByteUTF16(image[ix]);
+        bool isFullWidth = IsFullWidthCharacter(image[ix]);
 
         // 이전 문자가 4바이트 문자였으면 스킵.
         if (isPervious4Byte)
         {
-            isPervious4Byte = is4Byte;
+            isPervious4Byte = false;
             continue;
+        }
+
+        if (isFullWidth)
+        {
+            nextX += 2;
+        }
+        else
+        {
+            ++nextX;
         }
 
         // 잘못된 위치인지 확인.
@@ -231,7 +243,7 @@ void Engine::Draw(const Vector2& position, const wchar_t* image, Color color, in
 
         int px = position.x - 1;
 
-        // 앞의 문자가 전각인 경우.
+        // 한 칸 앞의 문자가 전각인 경우.
         if (px >= 0 && IsFullWidthCharacter(imageBuffer[px][y].data->Char.UnicodeChar))
         {
             // 내가 가려지는 경우.
