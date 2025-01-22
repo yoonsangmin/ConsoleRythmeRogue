@@ -20,7 +20,7 @@ Map::Map(GameLevel* refLevel)
 {
 }
 
-void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize, float enemySpawnCapability, int enemyMaxPerRoom)
+void Map::InitializeMap(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize, float enemySpawnCapability, int enemyMaxPerRoom)
 {
     ClearRooms();
 
@@ -53,6 +53,9 @@ void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int ta
     
     // 벽 생성.
     SpawnWalls();
+
+    // 계단 생성.
+    SpawnStair();
 
     // 적 생성.
     CreateEnemies(enemySpawnCapability, enemyMaxPerRoom);
@@ -135,6 +138,18 @@ void Map::ClearRooms()
 
     mapPositions.clear();
     objectPositions.clear();
+}
+
+void Map::SpawnStair()
+{
+    Room& lastRoom = rooms[rooms.Size() - 1];
+
+    int randomX = Random(lastRoom.Left(), lastRoom.Right());
+    int randomY = Random(lastRoom.Top(), lastRoom.Bottom());
+    // X축은 짝수 자리로 만들기.
+    randomX = randomX & 1 ? randomX - 1 : randomX;
+
+    TrySpawnStairAt(randomX, randomY, rooms.Size() - 1);
 }
 
 void Map::CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom)
@@ -538,6 +553,26 @@ void Map::TrySpawnDoorAt(int x, int y, int roomIndex)
             }
         }
     }
+}
+
+bool Map::TrySpawnStairAt(int x, int y, int roomIndex)
+{
+    if (!objectPositions.count({ x, y }))
+    {
+        Actor* actor = Engine::Get().SpawnActor<Stair>(Vector2(x, y));
+        if (Stair* stair = actor->As<Stair>())
+        {
+            objectPositions.insert({ x, y });
+            if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
+            {
+                roomActors[roomIndex].push_back(stair);
+            }
+            
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Map::TrySpawnWallAt(int x, int y, int roomIndex)

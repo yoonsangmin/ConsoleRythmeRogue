@@ -45,9 +45,10 @@ public:
     Map() = delete;
     Map(GameLevel* refLevel);
 
-    void CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount = 5, const Vector2& maxRoomSize = Vector2(10, 5), float enemySpawnCapability = 0.7f, int enemyMaxPerRoom = 3);
+    void InitializeMap(const Vector2& screenMin, const Vector2& screenMax, int targetCount = 5, const Vector2& maxRoomSize = Vector2(10, 5), float enemySpawnCapability = 0.7f, int enemyMaxPerRoom = 3);
     void ClearRooms();
 
+    void SpawnStair();
     void CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom);
     void SpawnPlayer();
 
@@ -67,6 +68,7 @@ private:
     void TrySpawnFloorAt(int x, int y, int roomIndex);
     void TrySpawanCorridorAt(int x, int y);
     void TrySpawnDoorAt(int x, int y, int roomIndex);
+    bool TrySpawnStairAt(int x, int y, int roomIndex);
     void TrySpawnWallAt(int x, int y, int roomIndex = -1);
     void TrySpawnRandomEnemyAt(int x, int y, int roomIndex);
 

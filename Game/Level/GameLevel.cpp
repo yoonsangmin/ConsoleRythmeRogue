@@ -30,7 +30,7 @@ void GameLevel::BeginPlay()
     Super::BeginPlay();
 
     map = new Map(this);
-    map->CreateRooms(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
+    map->InitializeMap(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
 }
 
 void GameLevel::Tick(float deltaTime)
