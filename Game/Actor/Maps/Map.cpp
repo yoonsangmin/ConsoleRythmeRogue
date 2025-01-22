@@ -17,7 +17,7 @@ Map::Map(const Vector2& screenMin, const Vector2& screenMax, int targetCount, co
 
 void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize)
 {
-    spawnedPositions.clear();
+    ClearRooms();
 
     int maxRoomSizeX = maxRoomSize.x < MIN_WIDTH ? MIN_WIDTH : maxRoomSize.x;
     int maxRoomSizeY = maxRoomSize.y < MIN_HEIGHT ? MIN_HEIGHT : maxRoomSize.y;
@@ -37,12 +37,14 @@ void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int ta
             break;
         }
     }
+    
+    roomActors.resize(rooms.Size(), std::vector<Actor*>());
 
     // 바닥 생성.
     SpawnFloor();
 
     // 통로 생성.
-    SpawnCorridorsAndDoors();
+    SpawanAllCorridorsAndDoors();
     
     // 벽 생성.
     SpawnWalls();
@@ -75,6 +77,14 @@ bool Map::CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int
 
 void Map::ClearRooms()
 {
+    rooms.Clear();
+
+    roomActors.clear();
+    corridors.Clear();
+    corridorWalls.Clear();
+
+    mapPositions.clear();
+    objectPositions.clear();
 }
 
 void Map::SpawnFloor()
@@ -86,17 +96,17 @@ void Map::SpawnFloor()
         {
             for (int x = room.Left(); x <= room.Right(); x += 2)
             {
-                if (!spawnedPositions.count({ x, y }))
+                if (!mapPositions.count({ x, y }))
                 {
                     Engine::Get().SpawnActor<Floor>(Vector2(x, y));
-                    spawnedPositions.insert({ x, y });
+                    mapPositions.insert({ x, y });
                 }
             }
         }
     }
 }
 
-void Map::SpawnCorridorsAndDoors()
+void Map::SpawanAllCorridorsAndDoors()
 {
     // 프림 알고리즘.
     std::multimap<int, std::pair<int, int>> edges;
@@ -148,11 +158,11 @@ void Map::SpawnCorridorsAndDoors()
     
     for (int ix = 0; ix < selectedEdges.Size(); ++ix)
     {
-        SpawnCorridor(selectedEdges[ix].first, selectedEdges[ix].second);
+        SpawnCorridorBetweenRooms(selectedEdges[ix].first, selectedEdges[ix].second);
     }
 }
 
-void Map::SpawnCorridor(int room1Index, int room2Index)
+void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
 {
     // 두 방의 중심 좌표 가져오기.
     Room room1 = rooms[room1Index];
@@ -160,12 +170,16 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
 
     Room& leftRoom = room1.Center().x < room2.Center().x ? room1 : room2;
     Room& rightRoom = room1.Center().x < room2.Center().x ? room2 : room1;
+    int leftRoomIndex = room1.Center().x < room2.Center().x ? room1Index : room2Index;
+    int rightRoomIndex = room1.Center().x < room2.Center().x ? room2Index : room1Index;
 
     int midX = (leftRoom.Right() + rightRoom.Left()) / 2;
     midX = midX & 1 ? midX - 1 : midX;
 
     Room& topRoom = room1.Center().y < room2.Center().y ? room1 : room2;
     Room& bottomRoom = room1.Center().y < room2.Center().y ? room2 : room1;
+    int topRoomIndex = room1.Center().y < room2.Center().y ? room1Index : room2Index;
+    int bottomRoomIndex = room1.Center().y < room2.Center().y ? room2Index : room1Index;
     
     // X축 기준으로 평행할 때.
     if (topRoom.Top() - ROOM_SPACING <= bottomRoom.Top() && bottomRoom.Top() <= topRoom.Bottom() + ROOM_SPACING)
@@ -173,43 +187,23 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
         // 왼쪽 방 가로선.
         for (int x = leftRoom.Right() + 2; x <= midX; x += 2)
         {
-            if (!spawnedPositions.count({ x, leftRoom.Center().y }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(x, leftRoom.Center().y));
-                spawnedPositions.insert({ x, leftRoom.Center().y });
-            }
+            TrySpawanCorridorAt(x, leftRoom.Center().y);
         }
         // 문 생성.
-        if (!doorPositions.count({ leftRoom.Right() + 2, leftRoom.Center().y }))
-        {
-            Engine::Get().SpawnActor<Door>(Vector2(leftRoom.Right() + 2, leftRoom.Center().y));
-            doorPositions.insert({ leftRoom.Right() + 2, leftRoom.Center().y });
-        }
+        TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
         // 오른쪽 방 가로선.
         for (int x = rightRoom.Left() - 2; x >= midX; x -= 2)
         {
-            if (!spawnedPositions.count({ x, rightRoom.Center().y }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(x, rightRoom.Center().y));
-                spawnedPositions.insert({ x, rightRoom.Center().y });
-            }
+            TrySpawanCorridorAt(x, rightRoom.Center().y);
         }
         // 문 생성.
-        if (!doorPositions.count({ rightRoom.Left() - 2, rightRoom.Center().y }))
-        {
-            Engine::Get().SpawnActor<Door>(Vector2(rightRoom.Left() - 2, rightRoom.Center().y));
-            doorPositions.insert({ rightRoom.Left() - 2, rightRoom.Center().y });
-        }
+        TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
 
         // 세로선.
         for (int y = topRoom.Center().y; y <= bottomRoom.Center().y; ++y)
         {
-            if (!spawnedPositions.count({ midX, y }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-                spawnedPositions.insert({ midX, y });
-            }
+            TrySpawanCorridorAt(midX, y);
         }
     }
     // Y축 기준으로 평행할 때.
@@ -223,34 +217,18 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
         // 위쪽 방 세로선.
         for (int y = topRoom.Bottom() + 1; y <= midY; ++y)
         {
-            if (!spawnedPositions.count({ topCentX, y }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(topCentX, y));
-                spawnedPositions.insert({ topCentX, y });
-            }
+            TrySpawanCorridorAt(topCentX, y);
         }
         // 문 생성.
-        if (!doorPositions.count({ topCentX, topRoom.Bottom() + 1 }))
-        {
-            Engine::Get().SpawnActor<Door>(Vector2(topCentX, topRoom.Bottom() + 1));
-            doorPositions.insert({ topCentX, topRoom.Bottom() + 1 });
-        }
+        TrySpawanDoorAt(topCentX, topRoom.Bottom() + 1, topRoomIndex);
 
         // 아래쪽 방 세로선.
         for (int y = bottomRoom.Top() - 1; y >= midY; --y)
         {
-            if (!spawnedPositions.count({ bottomCentX, y }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(bottomCentX, y));
-                spawnedPositions.insert({ bottomCentX, y });
-            }
+            TrySpawanCorridorAt(bottomCentX, y);
         }
         // 문 생성.
-        if (!doorPositions.count({ bottomCentX, bottomRoom.Top() - 1 }))
-        {
-            Engine::Get().SpawnActor<Door>(Vector2(bottomCentX, bottomRoom.Top() - 1));
-            doorPositions.insert({ bottomCentX, bottomRoom.Top() - 1 });
-        }
+        TrySpawanDoorAt(bottomCentX, bottomRoom.Top() - 1, bottomRoomIndex);
 
         int leftCentX = leftRoom.Center().x & 1 ? leftRoom.Center().x - 1 : leftRoom.Center().x;
         int rightCentX = rightRoom.Center().x & 1 ? rightRoom.Center().x - 1 : rightRoom.Center().x;
@@ -258,11 +236,7 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
         // 가로선.
         for (int x = leftCentX; x <= rightCentX; x += 2)
         {
-            if (!spawnedPositions.count({ x, midY }))
-            {
-                Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-                spawnedPositions.insert({ x, midY });
-            }
+            TrySpawanCorridorAt(x, midY);
         }
     }
     // ㄱ자 통로 생성. 세 번 꺾이게.
@@ -284,53 +258,29 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
                 {
                     if (x < midX)
                     {
-                        if (!spawnedPositions.count({ x, leftRoom.Center().y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, leftRoom.Center().y));
-                            spawnedPositions.insert({ x, leftRoom.Center().y });
-                        }
+                        TrySpawanCorridorAt(x, leftRoom.Center().y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ x, midY }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-                            spawnedPositions.insert({ x, midY });
-                        }
+                        TrySpawanCorridorAt(x, midY);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ leftRoom.Right() + 2, leftRoom.Center().y }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(leftRoom.Right() + 2, leftRoom.Center().y));
-                    doorPositions.insert({ leftRoom.Right() + 2, leftRoom.Center().y });
-                }
+                TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
                 for (int y = rightRoom.Top() - 1; y >= leftRoom.Center().y; --y)
                 {
                     if (y > midY)
                     {
-                        if (!spawnedPositions.count({ rightCentX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(rightCentX, y));
-                            spawnedPositions.insert({ rightCentX, y });
-                        }
+                        TrySpawanCorridorAt(rightCentX, y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ midX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-                            spawnedPositions.insert({ midX, y });
-                        }
+                        TrySpawanCorridorAt(midX, y);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ rightCentX, rightRoom.Top() - 1 }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(rightCentX, rightRoom.Top() - 1));
-                    doorPositions.insert({ rightCentX, rightRoom.Top() - 1 });
-                }
+                TrySpawanDoorAt(rightCentX, rightRoom.Top() - 1, rightRoomIndex);
             }
             // 아래쪽->오른쪽.
             else
@@ -341,53 +291,29 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
                 {
                     if (y < midY)
                     {
-                        if (!spawnedPositions.count({ leftCentX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(leftCentX, y));
-                            spawnedPositions.insert({ leftCentX, y });
-                        }
+                        TrySpawanCorridorAt(leftCentX, y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ midX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-                            spawnedPositions.insert({ midX, y });
-                        }
+                        TrySpawanCorridorAt(midX, y);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ leftCentX, leftRoom.Bottom() + 1 }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(leftCentX, leftRoom.Bottom() + 1));
-                    doorPositions.insert({ leftCentX, leftRoom.Bottom() + 1 });
-                }
+                TrySpawanDoorAt(leftCentX, leftRoom.Bottom() + 1, leftRoomIndex);
 
                 for (int x = rightRoom.Left() - 2; x >= leftCentX; x -= 2)
                 {
                     if (x > midX)
                     {
-                        if (!spawnedPositions.count({ x, rightRoom.Center().y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, rightRoom.Center().y));
-                            spawnedPositions.insert({ x, rightRoom.Center().y });
-                        }
+                        TrySpawanCorridorAt(x, rightRoom.Center().y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ x, midY }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-                            spawnedPositions.insert({ x, midY });
-                        }
+                        TrySpawanCorridorAt(x, midY);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ rightRoom.Left() - 2, rightRoom.Center().y }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(rightRoom.Left() - 2, rightRoom.Center().y));
-                    doorPositions.insert({ rightRoom.Left() - 2, rightRoom.Center().y });
-                }
+                TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
             }
         }
         // 좌하, 우상.
@@ -406,53 +332,29 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
                 {
                     if (x < midX)
                     {
-                        if (!spawnedPositions.count({ x, leftRoom.Center().y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, leftRoom.Center().y));
-                            spawnedPositions.insert({ x, leftRoom.Center().y });
-                        }
+                        TrySpawanCorridorAt(x, leftRoom.Center().y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ x, midY }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-                            spawnedPositions.insert({ x, midY });
-                        }
+                        TrySpawanCorridorAt(x, midY);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ leftRoom.Right() + 2, leftRoom.Center().y }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(leftRoom.Right() + 2, leftRoom.Center().y));
-                    doorPositions.insert({ leftRoom.Right() + 2, leftRoom.Center().y });
-                }
+                TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
                 for (int y = rightRoom.Bottom() + 1; y <= leftRoom.Center().y; ++y)
                 {
                     if (y < midY)
                     {
-                        if (!spawnedPositions.count({ rightCentX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(rightCentX, y));
-                            spawnedPositions.insert({ rightCentX, y });
-                        }
+                        TrySpawanCorridorAt(rightCentX, y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ midX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-                            spawnedPositions.insert({ midX, y });
-                        }
+                        TrySpawanCorridorAt(midX, y);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ rightCentX, rightRoom.Bottom() + 1 }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(rightCentX, rightRoom.Bottom() + 1));
-                    doorPositions.insert({ rightCentX, rightRoom.Bottom() + 1 });
-                }
+                TrySpawanDoorAt(rightCentX, rightRoom.Bottom() + 1, rightRoomIndex);
             }
             // 위쪽->오른쪽.
             else
@@ -463,172 +365,134 @@ void Map::SpawnCorridor(int room1Index, int room2Index)
                 {
                     if (y > midY)
                     {
-                        if (!spawnedPositions.count({ leftCentX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(leftCentX, y));
-                            spawnedPositions.insert({ leftCentX, y });
-                        }
+                        TrySpawanCorridorAt(leftCentX, y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ midX, y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-                            spawnedPositions.insert({ midX, y });
-                        }
+                        TrySpawanCorridorAt(midX, y);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ leftCentX, leftRoom.Top() - 1 }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(leftCentX, leftRoom.Top() - 1));
-                    doorPositions.insert({ leftCentX, leftRoom.Top() - 1 });
-                }
+                TrySpawanDoorAt(leftCentX, leftRoom.Top() - 1, leftRoomIndex);
 
                 for (int x = rightRoom.Left() - 2; x >= leftCentX; x -= 2)
                 {
                     if (x > midX)
                     {
-                        if (!spawnedPositions.count({ x, rightRoom.Center().y }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, rightRoom.Center().y));
-                            spawnedPositions.insert({ x, rightRoom.Center().y });
-                        }
+                        TrySpawanCorridorAt(x, rightRoom.Center().y);
                     }
                     else
                     {
-                        if (!spawnedPositions.count({ x, midY }))
-                        {
-                            Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-                            spawnedPositions.insert({ x, midY });
-                        }
+                        TrySpawanCorridorAt(x, midY);
                     }
                 }
                 // 문 생성.
-                if (!doorPositions.count({ rightRoom.Left() - 2, rightRoom.Center().y }))
-                {
-                    Engine::Get().SpawnActor<Door>(Vector2(rightRoom.Left() - 2, rightRoom.Center().y));
-                    doorPositions.insert({ rightRoom.Left() - 2, rightRoom.Center().y });
-                }
+                TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
             }
         }
-
-
-
-        //int x1 = room1.Center().x;
-        //int y1 = room1.Center().y;
-        //int x2 = room2.Center().x;
-        //int y2 = room2.Center().y;
-
-        //// x 축은 짝수 칸에만 생성할 수 있게 수정.
-        //x1 = x1 & 1 ? x1 - 1 : x1;
-        //x2 = x2 & 1 ? x2 - 1 : x2;
-
-        //int minX = x1 < x2 ? x1 : x2;
-        //int maxX = x1 >= x2 ? x1 : x2;
-        //int minY = y1 < y2 ? y1 : y2;
-        //int maxY = y1 >= y2 ? y1 : y2;
-
-        //int midX = (minX + maxX) / 2;
-        //int midY = (minY + maxY) / 2;
-
-        //int random = Random(0, 1);
-
-        //if (true)
-        //{
-        //    for (int x = minX; x <= maxX; x += 2)
-        //    {
-        //        if (x < midX)
-        //        {
-        //            if (!spawnedPositions.count({ x, y1 }))
-        //            {
-        //                Engine::Get().SpawnActor<Corridor>(Vector2(x, y1));
-        //                spawnedPositions.insert({ x, y1 });
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (!spawnedPositions.count({ x, midY }))
-        //            {
-        //                Engine::Get().SpawnActor<Corridor>(Vector2(x, midY));
-        //                spawnedPositions.insert({ x, midY });
-        //            }
-        //        }
-        //    }
-
-        //    for (int y = minY; y <= maxY; ++y)
-        //    {
-        //        if (y < midY)
-        //        {
-        //            if (!spawnedPositions.count({ x2, y }))
-        //            {
-        //                Engine::Get().SpawnActor<Corridor>(Vector2(x2, y));
-        //                spawnedPositions.insert({ x2, y });
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (!spawnedPositions.count({ midX, y }))
-        //            {
-        //                Engine::Get().SpawnActor<Corridor>(Vector2(midX, y));
-        //                spawnedPositions.insert({ midX, y });
-        //            }
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    for (int x = minX; x <= maxX; x += 2)
-        //    {
-        //        if (!spawnedPositions.count({ x, y2 }))
-        //        {
-        //            Engine::Get().SpawnActor<Corridor>(Vector2(x, y2));
-        //            spawnedPositions.insert({ x, y2 });
-        //        }
-        //    }
-
-        //    for (int y = minY; y <= maxY; ++y)
-        //    {
-        //        if (!spawnedPositions.count({ x1, y }))
-        //        {
-        //            Engine::Get().SpawnActor<Corridor>(Vector2(x1, y));
-        //            spawnedPositions.insert({ x1, y });
-        //        }
-        //    }
-        //}
     }
 }
 
 void Map::SpawnWalls()
 {
     // 벽 생성.
-    for (const auto& room : rooms)
+    for (int ix = 0; ix < rooms.Size(); ++ix)
     {
-        for (int y = room.Top() - 1; y <= room.Bottom() + 1; ++y)
+        for (int y = rooms[ix].Top() - 1; y <= rooms[ix].Bottom() + 1; ++y)
         {
-            if (y != room.Top() - 1 && y != room.Bottom() + 1)
+            if (y != rooms[ix].Top() - 1 && y != rooms[ix].Bottom() + 1)
             {
-                if (!spawnedPositions.count({ room.Left() - 2, y }))
-                {
-                    Engine::Get().SpawnActor<Wall>(Vector2(room.Left() - 2, y));
-                    spawnedPositions.insert({ room.Left() - 2, y });
-                }
-
-                if (!spawnedPositions.count({ room.Right() + 2, y }))
-                {
-                    Engine::Get().SpawnActor<Wall>(Vector2(room.Right() + 2, y));
-                    spawnedPositions.insert({ room.Right() + 2, y });
-                }
+                TrySpawnWallAt(rooms[ix].Left() - 2, y, ix);
+                TrySpawnWallAt(rooms[ix].Right() + 2, y, ix);
 
                 continue;
             }
-            for (int x = room.Left() - 2; x <= room.Right() + 2; x += 2)
+            for (int x = rooms[ix].Left() - 2; x <= rooms[ix].Right() + 2; x += 2)
             {
-                if (!spawnedPositions.count({ x, y }))
-                {
-                    Engine::Get().SpawnActor<Wall>(Vector2(x, y));
-                    spawnedPositions.insert({ x, y });
-                }
+                TrySpawnWallAt(x, y, ix);
+            }
+        }
+    }
+
+    // 통로를 따라서 투명 벽 생성.
+    for (int ix = 0; ix < corridors.Size(); ++ix)
+    {
+        int dx[] = { 0, 2, 0 ,-2 };
+        int dy[] = { -1, 0, 1 ,0 };
+
+        for (int jx = 0; jx < 4; ++jx)
+        {
+            int x = corridors[ix]->Position().x + dx[jx];
+            int y = corridors[ix]->Position().y + dy[jx];
+
+            TrySpawnWallAt(x, y);
+        }
+    }
+}
+
+void Map::TrySpawanFloorAt(int x, int y, int roomIndex)
+{
+    if (!mapPositions.count({ x, y }))
+    {
+        Actor* actor = Engine::Get().SpawnActor<Floor>(Vector2(x, y));
+        mapPositions.insert({ x, y });
+        if (Floor* floor = actor->As<Floor>())
+        {
+            if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
+            {
+                roomActors[roomIndex].push_back(floor);
+            }
+        }
+    }
+}
+
+void Map::TrySpawanCorridorAt(int x, int y)
+{
+    if (!mapPositions.count({ x, y }))
+    {
+        Actor* actor = Engine::Get().SpawnActor<Corridor>(Vector2(x, y));
+        mapPositions.insert({ x, y });
+        if (Corridor* corridor = actor->As<Corridor>())
+        {
+            corridors.PushBack(corridor);
+        }
+    }
+}
+
+void Map::TrySpawanDoorAt(int x, int y, int roomIndex)
+{
+    if (!objectPositions.count({ x, y }))
+    {
+        Actor* actor = Engine::Get().SpawnActor<Door>(Vector2(x, y));
+        objectPositions.insert({ x, y });
+        if (Door* door = actor->As<Door>())
+        {
+            if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
+            {
+                roomActors[roomIndex].push_back(door);
+            }
+        }
+    }
+}
+
+void Map::TrySpawnWallAt(int x, int y, int roomIndex)
+{
+    if (!mapPositions.count({ x, y }))
+    {
+        Actor* actor = Engine::Get().SpawnActor<Wall>(Vector2(x, y));
+        mapPositions.insert({ x, y });
+
+        if (Wall* wall = actor->As<Wall>())
+        {
+            if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
+            {
+                roomActors[roomIndex].push_back(wall);
+            }
+            // 복도용 벽.
+            else
+            {
+                wall->SetVisible(false);
+                corridorWalls.PushBack(wall);
             }
         }
     }

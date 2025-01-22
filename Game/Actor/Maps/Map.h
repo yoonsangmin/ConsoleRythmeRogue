@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <set>
+#include <vector>
 #include <utility>
 
 #include "Math/Vector2.h"
@@ -33,6 +34,8 @@ struct Room
 };
 
 class Actor;
+class Corridor;
+class Wall;
 class Map : public RTTI
 {
     RTTI_DECLARATIONS(Map, RTTI)
@@ -47,10 +50,15 @@ public:
 
 private:
     void SpawnFloor();
-    void SpawnCorridorsAndDoors();
-    void SpawnCorridor(int room1Index, int room2Index);
+    void SpawanAllCorridorsAndDoors();
+    void SpawnCorridorBetweenRooms(int room1Index, int room2Index);
     void SpawnWalls();
     bool CheckCollision(const Room& newRoom);
+
+    void TrySpawanFloorAt(int x, int y, int roomIndex);
+    void TrySpawanCorridorAt(int x, int y);
+    void TrySpawanDoorAt(int x, int y, int roomIndex);
+    void TrySpawnWallAt(int x, int y, int roomIndex = -1);
 
 private:
     const int MIN_WIDTH = 8;
@@ -59,9 +67,17 @@ private:
     const int ROOM_SPACING = 3;
 
     List<Room> rooms;
+    //TODO: 사용하나?
     List<Actor*> objects;
+
+    // 각 방마다의 액터들.
+    std::vector<std::vector<Actor*>> roomActors;
+    // 통로 액터들.
+    List<Corridor*> corridors;
+    List<Wall*> corridorWalls;
+
     // 중복 생성 방지.
-    std::set<std::pair<int, int>> spawnedPositions;
-    std::set<std::pair<int, int>> doorPositions;
+    std::set<std::pair<int, int>> mapPositions;
+    std::set<std::pair<int, int>> objectPositions;
 
 };

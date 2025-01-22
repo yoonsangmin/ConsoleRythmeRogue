@@ -48,7 +48,7 @@ void GameLevel::BeginPlay()
 {
     Super::BeginPlay();
 
-    Map map(gameScreen[0], gameScreen[1], 2, Vector2(15, 4));
+    Map map(gameScreen[0], gameScreen[1], 6, Vector2(15, 4));
 }
 
 void GameLevel::Tick(float deltaTime)
