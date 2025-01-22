@@ -19,18 +19,28 @@ public:
     virtual void Draw() override;
 
     // 방 생성.
+    void GoToNextLevel();
     void GenerateMap();
 
     // Getter.
     inline float GetTickTimer() const { return tickTimer; }
     inline Map* GetMap() { return map; }
     
+private:
+    void GameClear();
+
+    void DrawBeatUI();
+    void DrawLevelUI();
+    void DrawHPUI();
+    void DrawEnemyUI();
+
 public:
     // 80BPM - 1비트에 60/80초 - 0.75초.
     // 120BPM - 1비트에 60/120초 - 0.5초.
     const float tickPerSecond;
 
 private:
+
     float tickTimer = 0;
 
     // 게임 화면 공간.
@@ -46,5 +56,10 @@ private:
     
     // 맵 정보.
     Map* map = nullptr;
+    int currentLevel = 1;
+    const int END_LEVEL = 1;
+
+    // 플레이어.
+    Player* refPlayer = nullptr;
 
 };

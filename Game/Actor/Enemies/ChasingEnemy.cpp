@@ -3,7 +3,7 @@
 #include "Level/Level.h"
 #include "Actor/Player.h"
 
-ChasingEnemy::ChasingEnemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, bool is4DirectionRandom, int ticksPerMove, int drawOrder)
+ChasingEnemy::ChasingEnemy(GameLevel* level, const wchar_t* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, bool is4DirectionRandom, int ticksPerMove, int drawOrder)
     : Enemy(level, name, str, position, hp, color, ticksPerMove, drawOrder)
 {
 }

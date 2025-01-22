@@ -6,6 +6,7 @@
 class ENGINE_API Timer
 {
 public:
+    Timer() = default;
     // 생성자에서 타이머의 목표 시간 설정.
     Timer(float targetTime);
 

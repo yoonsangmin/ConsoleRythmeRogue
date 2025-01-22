@@ -120,10 +120,13 @@ inline bool IsFullWidth(wchar_t c1)
     return (c1 >= 0xFF01 && c1 <= 0xFF5E);
 }
 
-// CJK 문자 범위: U+4E00 ~ U+9FFF.
+// CJK.
 inline bool IsCJK(wchar_t c1)
 {
-    return (c1 >= 0x4E00 && c1 <= 0x9FFF);
+    return ((c1 >= 0x4E00 && c1 <= 0x9FFF) || // CJK 통합 한자.
+        (c1 >= 0xAC00 && c1 <= 0xD7A3) || // 한글 음절.
+        (c1 >= 0xF900 && c1 <= 0xFAFF) || // CJK 호환용 한자.
+        (c1 >= 0x3400 && c1 <= 0x4DBF));  // CJK 통합 한자 확장 A.
 }
 
 // 주어진 wchar_t 문자가 이모지인지 확인하는 함수.

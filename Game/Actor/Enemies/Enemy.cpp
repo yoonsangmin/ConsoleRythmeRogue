@@ -2,13 +2,13 @@
 #include "Level/GameLevel.h"
 #include "Actor/Player.h"
 
-Enemy::Enemy(GameLevel* refLevel, const char* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, int ticksPerMove, int drawOrder)
+Enemy::Enemy(GameLevel* refLevel, const wchar_t* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, int ticksPerMove, int drawOrder)
     : RythmeActor(refLevel, str, position, hp, drawOrder, color), ticksPerMove(ticksPerMove)
 {
     // 이름 문자열 복사.
-    auto length = strlen(name) + 1;
-    this->name = new char[length];
-    strcpy_s(this->name, length, name);
+    auto length = wcslen(name) + 1;
+    this->name = new wchar_t[length];
+    wcscpy_s(this->name, length, name);
 
     collisionType = ECollision::Enemy;
 }
@@ -42,6 +42,11 @@ void Enemy::Tick(float deltaTime)
         Move(moveDirection);
         canMove = false;
     }
+}
+
+wchar_t* Enemy::GetName()
+{
+    return name;
 }
 
 EDirection::Flags Enemy::DecideDirection()

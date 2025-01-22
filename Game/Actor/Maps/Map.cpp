@@ -706,17 +706,17 @@ void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
         switch (random)
         {
         case 0:
-            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, "박쥐", L"🦇", Vector2(x, y), 2, Color::Blue);
+            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"박쥐", L"🦇", Vector2(x, y), 4, Color::Blue);
             break;
         case 1:
-            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, "유령", L"👻", Vector2(x, y), 1, Color::White);
+            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"유령", L"👻", Vector2(x, y), 4, Color::White);
             break;
         case 2:
-            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, "로봇", L"🤖", Vector2(x, y), 2, Color::BrightMagenta);
+            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"로봇", L"🤖", Vector2(x, y), 4, Color::BrightMagenta);
             break;
         case 3:    
         default:
-            actor = Engine::Get().SpawnActor<Enemy>(refLevel, "수호자", L"🗿", Vector2(x, y), 3, Color::BrightYellow);
+            actor = Engine::Get().SpawnActor<Enemy>(refLevel, L"수호자", L"🗿", Vector2(x, y), 6, Color::BrightYellow);
             break;
         }
 

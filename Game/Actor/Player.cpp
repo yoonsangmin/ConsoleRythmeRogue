@@ -68,6 +68,15 @@ void Player::Tick(float deltaTime)
     {
         canMove = true;
     }
+
+    if (lastHitEnemy != nullptr)
+    {
+        enemyTimer.Tick(deltaTime);
+        if (enemyTimer.IsTimeOut())
+        {
+            lastHitEnemy = nullptr;
+        }
+    }
 }
 
 void Player::OnCollisionHit(Actor& other)
@@ -78,6 +87,10 @@ void Player::OnCollisionHit(Actor& other)
         {
             enemy->TakeDamage(1);
         }
+
+        lastHitEnemy = enemy;
+        enemyTimer.Reset();
+        enemyTimer.SetTime(3.0f);
     }
 }
 
@@ -86,7 +99,7 @@ void Player::OnBeginOverlap(Actor& other)
     if (other.As<Stair>())
     {
         // 방 내려가기.
-        refLevel->GenerateMap();
+        refLevel->GoToNextLevel();
         return;
     }
 }
