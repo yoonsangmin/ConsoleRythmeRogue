@@ -60,6 +60,8 @@ private:
 
     List<Room> rooms;
     List<Actor*> objects;
+    // 중복 생성 방지.
     std::set<std::pair<int, int>> spawnedPositions;
+    std::set<std::pair<int, int>> doorPositions;
 
 };
