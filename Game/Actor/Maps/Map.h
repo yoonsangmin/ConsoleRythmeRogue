@@ -18,7 +18,7 @@ struct Room
         int y1 = Center().y;
         int x2 = other.Center().x;
         int y2 = other.Center().y;
-        return std::abs(x1 - x2) + std::abs(y1 - y2);
+        return std::abs((x1 - x2) / 2) + std::abs(y1 - y2);
     }
     inline int Top() const { return y; }
     inline int Bottom() const { return y + height - 1; }
