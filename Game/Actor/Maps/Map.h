@@ -1,7 +1,11 @@
 ﻿#pragma once
 
 #include "RTTI.h"
+
 #include <cmath>
+#include <set>
+#include <utility>
+
 #include "Math/Vector2.h"
 #include "Container/List.h"
 
@@ -42,7 +46,10 @@ public:
     void ClearRooms();
 
 private:
-    void SpawnMapObjects(const Room& room);
+    void SpawnFloor();
+    void SpawnCorridorsAndDoors();
+    void SpawnCorridor(int room1Index, int room2Index);
+    void SpawnWalls();
     bool CheckCollision(const Room& newRoom);
 
 private:
@@ -53,5 +60,6 @@ private:
 
     List<Room> rooms;
     List<Actor*> objects;
+    std::set<std::pair<int, int>> spawnedPositions;
 
 };
