@@ -2,28 +2,13 @@
 #include "Actor/Player.h"
 #include "Actor/Enemies/Enemy.h"
 #include "Engine/Engine.h"
-#include "Actor/Maps/Wall.h"
-#include "Actor/Maps/Floor.h"
-#include "Actor/Maps/Door.h"
-#include "Actor/Maps/Corridor.h"
-#include "Actor/Maps/Stair.h"
 #include "Actor/Maps/Map.h"
 
 GameLevel::GameLevel(float tickPerSecond)
     : tickPerSecond(tickPerSecond)
 {
-    // 플레이어 생성.
-    Engine::Get().SpawnActor<Player>(this, L"🚶", Vector2(12, 10));
-
     // 적 생성 테스트.
     Engine::Get().SpawnActor<Enemy>(this, "박쥐", L"🦇", Vector2(10, 10));
-
-    //// 맵 생성 테스트.
-    //Engine::Get().SpawnActor<Wall>(Vector2(20, 12));
-    //Engine::Get().SpawnActor<Door>(Vector2(18, 12));
-    //Engine::Get().SpawnActor<Floor>(Vector2(16, 12));
-    //Engine::Get().SpawnActor<Corridor>(Vector2(14, 12));
-    //Engine::Get().SpawnActor<Stair>(Vector2(12, 12));
 
     // 공간 나누기.
     Vector2 screenSize = Engine::Get().ScreenSize();
@@ -48,7 +33,8 @@ void GameLevel::BeginPlay()
 {
     Super::BeginPlay();
 
-    Map map(gameScreen[0], gameScreen[1], 6, Vector2(15, 4));
+    map = new Map(gameScreen[0], gameScreen[1], 6, Vector2(15, 4));
+    Engine::Get().SpawnActor<Player>(this, L"🚶", map->GetRoomInfo(0).Center());
 }
 
 void GameLevel::Tick(float deltaTime)

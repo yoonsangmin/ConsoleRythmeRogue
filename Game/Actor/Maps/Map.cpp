@@ -77,6 +77,24 @@ bool Map::CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int
 
 void Map::ClearRooms()
 {
+    for (auto& actors : roomActors)
+    {
+        for (auto& actor : actors)
+        {
+            actor->Destroy();
+        }
+    }
+
+    for (auto& corridor : corridors)
+    {
+        corridor->Destroy();
+    }
+
+    for (auto& wall : corridorWalls)
+    {
+        wall->Destroy();
+    }
+
     rooms.Clear();
 
     roomActors.clear();
@@ -90,17 +108,13 @@ void Map::ClearRooms()
 void Map::SpawnFloor()
 {
     // 바닥 생성.
-    for (const auto& room : rooms)
+    for (int ix = 0; ix < rooms.Size(); ++ix)
     {
-        for (int y = room.Top(); y <= room.Bottom(); ++y)
+        for (int y = rooms[ix].Top(); y <= rooms[ix].Bottom(); ++y)
         {
-            for (int x = room.Left(); x <= room.Right(); x += 2)
+            for (int x = rooms[ix].Left(); x <= rooms[ix].Right(); x += 2)
             {
-                if (!mapPositions.count({ x, y }))
-                {
-                    Engine::Get().SpawnActor<Floor>(Vector2(x, y));
-                    mapPositions.insert({ x, y });
-                }
+                TrySpawnFloorAt(x, y, ix);
             }
         }
     }
@@ -190,7 +204,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
             TrySpawanCorridorAt(x, leftRoom.Center().y);
         }
         // 문 생성.
-        TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
+        TrySpawnDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
         // 오른쪽 방 가로선.
         for (int x = rightRoom.Left() - 2; x >= midX; x -= 2)
@@ -198,7 +212,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
             TrySpawanCorridorAt(x, rightRoom.Center().y);
         }
         // 문 생성.
-        TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
+        TrySpawnDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
 
         // 세로선.
         for (int y = topRoom.Center().y; y <= bottomRoom.Center().y; ++y)
@@ -220,7 +234,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
             TrySpawanCorridorAt(topCentX, y);
         }
         // 문 생성.
-        TrySpawanDoorAt(topCentX, topRoom.Bottom() + 1, topRoomIndex);
+        TrySpawnDoorAt(topCentX, topRoom.Bottom() + 1, topRoomIndex);
 
         // 아래쪽 방 세로선.
         for (int y = bottomRoom.Top() - 1; y >= midY; --y)
@@ -228,7 +242,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
             TrySpawanCorridorAt(bottomCentX, y);
         }
         // 문 생성.
-        TrySpawanDoorAt(bottomCentX, bottomRoom.Top() - 1, bottomRoomIndex);
+        TrySpawnDoorAt(bottomCentX, bottomRoom.Top() - 1, bottomRoomIndex);
 
         int leftCentX = leftRoom.Center().x & 1 ? leftRoom.Center().x - 1 : leftRoom.Center().x;
         int rightCentX = rightRoom.Center().x & 1 ? rightRoom.Center().x - 1 : rightRoom.Center().x;
@@ -266,7 +280,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
+                TrySpawnDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
                 for (int y = rightRoom.Top() - 1; y >= leftRoom.Center().y; --y)
                 {
@@ -280,7 +294,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(rightCentX, rightRoom.Top() - 1, rightRoomIndex);
+                TrySpawnDoorAt(rightCentX, rightRoom.Top() - 1, rightRoomIndex);
             }
             // 아래쪽->오른쪽.
             else
@@ -299,7 +313,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(leftCentX, leftRoom.Bottom() + 1, leftRoomIndex);
+                TrySpawnDoorAt(leftCentX, leftRoom.Bottom() + 1, leftRoomIndex);
 
                 for (int x = rightRoom.Left() - 2; x >= leftCentX; x -= 2)
                 {
@@ -313,7 +327,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
+                TrySpawnDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
             }
         }
         // 좌하, 우상.
@@ -340,7 +354,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
+                TrySpawnDoorAt(leftRoom.Right() + 2, leftRoom.Center().y, leftRoomIndex);
 
                 for (int y = rightRoom.Bottom() + 1; y <= leftRoom.Center().y; ++y)
                 {
@@ -354,7 +368,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(rightCentX, rightRoom.Bottom() + 1, rightRoomIndex);
+                TrySpawnDoorAt(rightCentX, rightRoom.Bottom() + 1, rightRoomIndex);
             }
             // 위쪽->오른쪽.
             else
@@ -373,7 +387,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(leftCentX, leftRoom.Top() - 1, leftRoomIndex);
+                TrySpawnDoorAt(leftCentX, leftRoom.Top() - 1, leftRoomIndex);
 
                 for (int x = rightRoom.Left() - 2; x >= leftCentX; x -= 2)
                 {
@@ -387,7 +401,7 @@ void Map::SpawnCorridorBetweenRooms(int room1Index, int room2Index)
                     }
                 }
                 // 문 생성.
-                TrySpawanDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
+                TrySpawnDoorAt(rightRoom.Left() - 2, rightRoom.Center().y, rightRoomIndex);
             }
         }
     }
@@ -430,7 +444,7 @@ void Map::SpawnWalls()
     }
 }
 
-void Map::TrySpawanFloorAt(int x, int y, int roomIndex)
+void Map::TrySpawnFloorAt(int x, int y, int roomIndex)
 {
     if (!mapPositions.count({ x, y }))
     {
@@ -459,7 +473,7 @@ void Map::TrySpawanCorridorAt(int x, int y)
     }
 }
 
-void Map::TrySpawanDoorAt(int x, int y, int roomIndex)
+void Map::TrySpawnDoorAt(int x, int y, int roomIndex)
 {
     if (!objectPositions.count({ x, y }))
     {

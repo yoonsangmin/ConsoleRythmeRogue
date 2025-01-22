@@ -5,12 +5,13 @@
 
 // 리듬 로그 레벨
 class Player;
+class Map;
 class GameLevel : public Level
 {
     RTTI_DECLARATIONS(GameLevel, Level)
 
 public:
-    GameLevel(float tickPerSecond = 0.75f);
+    GameLevel(float tickPerSecond = 0.5f);
 
     virtual void BeginPlay() override;
     virtual void Tick(float deltaTime) override;
@@ -24,6 +25,7 @@ public:
     
 public:
     // 80BPM - 1비트에 60/80초 - 0.75초.
+    // 120BPM - 1비트에 60/120초 - 0.5초.
     const float tickPerSecond;
 
 private:
@@ -39,5 +41,8 @@ private:
     // 비트 표시 스크린.
     float beatScreenRatio = 0.1;
     Vector2 beatScreen[2];
+    
+    // 맵 정보.
+    Map* map;
 
 };

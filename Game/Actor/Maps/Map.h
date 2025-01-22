@@ -39,25 +39,27 @@ class Wall;
 class Map : public RTTI
 {
     RTTI_DECLARATIONS(Map, RTTI)
-
+   
 public:
     Map(const Vector2& screenMin, const Vector2& screenMax, int targetCount = 5, const Vector2& maxRoomSize = Vector2(10, 5));
 
     void CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize);
-    bool CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight);
-
     void ClearRooms();
 
+    inline Room GetRoomInfo(int index) { return rooms[index]; }
+
 private:
+    bool CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight);
+
     void SpawnFloor();
     void SpawanAllCorridorsAndDoors();
     void SpawnCorridorBetweenRooms(int room1Index, int room2Index);
     void SpawnWalls();
     bool CheckCollision(const Room& newRoom);
 
-    void TrySpawanFloorAt(int x, int y, int roomIndex);
+    void TrySpawnFloorAt(int x, int y, int roomIndex);
     void TrySpawanCorridorAt(int x, int y);
-    void TrySpawanDoorAt(int x, int y, int roomIndex);
+    void TrySpawnDoorAt(int x, int y, int roomIndex);
     void TrySpawnWallAt(int x, int y, int roomIndex = -1);
 
 private:
