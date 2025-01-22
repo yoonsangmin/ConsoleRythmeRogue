@@ -29,7 +29,7 @@ BOOL WINAPI MessageProcessor(DWORD message)
 Engine* Engine::instance = nullptr;
 
 Engine::Engine()
-	: quit(false), mainLevel(nullptr), screenSize(120, 40)
+	: quit(false), mainLevel(nullptr), screenSize(100, 30)
 {
     // 랜덤 시드 설정.
     srand((unsigned int)time(nullptr));
@@ -60,7 +60,7 @@ Engine::Engine()
     {
         renderTargets[ix] = new ScreenBuffer(size);
         renderTargets[ix]->SetCursorType(CursorType::NoCursor);
-        renderTargets[ix]->SetConsoleFontSize(20);
+        renderTargets[ix]->SetConsoleFontSize(30);
     }
 
     // 스왑 버퍼.

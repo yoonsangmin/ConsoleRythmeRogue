@@ -11,7 +11,7 @@ class Player : public RythmeActor
     RTTI_DECLARATIONS(Player, RythmeActor)
 
 public:
-    Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 10, const Color& color = Color::BrightWhite);
+    Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp = 10, int drawOrder = 10, const Color& color = Color::BrightWhite);
 
     virtual void Tick(float deltaTime) override;
 
@@ -20,6 +20,7 @@ public:
 
     virtual void Move(EDirection::Flags direction) override;
 
+    virtual void TakeDamage(int damage = 1) override;
     inline Enemy* LastHitEnemy() { return lastHitEnemy; }
 
 private:

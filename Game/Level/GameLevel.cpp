@@ -49,6 +49,15 @@ void GameLevel::Tick(float deltaTime)
     {
         tickTimer -= tickPerSecond;
     }
+
+    if (isClear || isDead)
+    {
+        quitTimer.Tick(deltaTime);
+        if (quitTimer.IsTimeOut())
+        {
+            Engine::Get().QuitGame();
+        }
+    }
 }
 
 void GameLevel::Draw()
@@ -77,16 +86,25 @@ void GameLevel::GoToNextLevel()
 void GameLevel::GenerateMap()
 {
     map->ClearRooms();
-    map->InitializeMap(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
+    map->InitializeMap(gameScreen[0], gameScreen[1], 4, Vector2(15, 8));
+}
+
+void GameLevel::PlayerDead()
+{
+    isDead = true;
+
+    // 조작 막기, 잠시 후 종료.
+    quitTimer.Reset();
+    quitTimer.SetTime(3.0f);
 }
 
 void GameLevel::GameClear()
 {
-    int x = beatScreen[1].x / 2 - 20;
-    int y = beatScreen[0].y + 2;
-    Engine::Get().Draw(Vector2(x, y), L"GAME CLEAR!!!", Color::BrightGreen, 0);
+    isClear = true;
 
-    //TODO: 조작 막기, 잠시 후 종료.
+    // 조작 막기, 잠시 후 종료.
+    quitTimer.Reset();
+    quitTimer.SetTime(3.0f);
 }
 
 void GameLevel::DrawBeatUI()
@@ -110,7 +128,19 @@ void GameLevel::DrawLevelUI()
     int x = uiScreen[0].x;
     int y = uiScreen[0].y + 2;
     wchar_t buffer[255];
-    swprintf(buffer, 255, L"현 재  층  : %d", currentLevel);
+
+    if (isClear)
+    {
+        swprintf(buffer, 255, L"GAME CLEAR!!!");
+    }
+    else if (isDead)
+    {
+        swprintf(buffer, 255, L"GAME OVER!!!");
+    }
+    else
+    {
+        swprintf(buffer, 255, L"현 재  층  : %d", currentLevel);
+    }
     Engine::Get().Draw(Vector2(x, y), buffer);
 }
 
@@ -132,7 +162,7 @@ void GameLevel::DrawHPUI()
 
     int count = 0;
     int index = 0;
-    while (count < refPlayer->GetHP() && index < 255)
+    while (count < refPlayer->GetHP() / 2 && index < 255)
     {
         // 짝수 자리에만 찍기.
         if (index & 1)
@@ -145,7 +175,7 @@ void GameLevel::DrawHPUI()
         ++count;
         ++index;
 
-        if (count == refPlayer->GetHP())
+        if (count == refPlayer->GetHP() / 2)
         {
             buffer[index] = '\0';
         }
@@ -217,7 +247,7 @@ void GameLevel::DrawEnemyUI()
 
     count = 0;
     index = 0;
-    while (count < enemy->GetHP() && index < 255)
+    while (count < enemy->GetHP() / 2 && index < 255)
     {
         // 짝수 자리에만 찍기.
         if (index & 1)
@@ -230,7 +260,7 @@ void GameLevel::DrawEnemyUI()
         ++count;
         ++index;
 
-        if (count == refPlayer->GetHP())
+        if (count == refPlayer->GetHP() / 2)
         {
             buffer[index] = '\0';
         }

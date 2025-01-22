@@ -2,6 +2,7 @@
 
 #include "Level/Level.h"
 #include "Math/Vector2.h"
+#include "Engine/Timer.h"
 
 // 리듬 로그 레벨
 class Player;
@@ -22,10 +23,12 @@ public:
     void GoToNextLevel();
     void GenerateMap();
 
+    void PlayerDead();
+
     // Getter.
     inline float GetTickTimer() const { return tickTimer; }
     inline Map* GetMap() { return map; }
-    
+    inline bool IsClear() { return isClear; }
 private:
     void GameClear();
 
@@ -57,9 +60,14 @@ private:
     // 맵 정보.
     Map* map = nullptr;
     int currentLevel = 1;
-    const int END_LEVEL = 1;
+    const int END_LEVEL = 2;
+    bool isClear = false;
+    bool isDead = false;
 
     // 플레이어.
     Player* refPlayer = nullptr;
+
+    // 종료 타이머.
+    Timer quitTimer;
 
 };

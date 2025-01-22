@@ -26,6 +26,11 @@ void Player::Tick(float deltaTime)
         Engine::Get().QuitGame();
     }
 
+    if (refLevel->IsClear())
+    {
+        return;
+    }
+
     // 리듬에 맞춰 이동.
     float halfTPS = refLevel->tickPerSecond / 2;
     if (canMove
@@ -109,4 +114,11 @@ void Player::Move(EDirection::Flags direction)
     Super::Move(direction);
 
     refLevel->GetMap()->CheckNextPlayerPosition(NextPosition().x, NextPosition().y);
+}
+
+void Player::TakeDamage(int damage)
+{
+    Super::TakeDamage(damage);
+
+    refLevel->PlayerDead();
 }
