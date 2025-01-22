@@ -170,7 +170,7 @@
     <ClCompile Include="Actor\Enemies\ChasingEnemy.cpp" />
     <ClCompile Include="Actor\Enemies\Enemy.cpp" />
     <ClCompile Include="Actor\Enemies\PatrollingEnemy.cpp" />
-    <ClCompile Include="Actor\Enemies\StationaryEnemy.cpp" />
+    <ClCompile Include="Actor\Enemies\RandomEnemy.cpp" />
     <ClCompile Include="Actor\Maps\Corridor.cpp" />
     <ClCompile Include="Actor\Maps\Door.cpp" />
     <ClCompile Include="Actor\Maps\Floor.cpp" />
@@ -186,7 +186,7 @@
     <ClInclude Include="Actor\Enemies\ChasingEnemy.h" />
     <ClInclude Include="Actor\Enemies\Enemy.h" />
     <ClInclude Include="Actor\Enemies\PatrollingEnemy.h" />
-    <ClInclude Include="Actor\Enemies\StationaryEnemy.h" />
+    <ClInclude Include="Actor\Enemies\RandomEnemy.h" />
     <ClInclude Include="Actor\Maps\Corridor.h" />
     <ClInclude Include="Actor\Maps\Door.h" />
     <ClInclude Include="Actor\Maps\Floor.h" />

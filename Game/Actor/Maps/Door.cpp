@@ -8,7 +8,7 @@ Door::Door(const Vector2& position)
     collisionType = ECollision::Door;
 }
 
-void Door::OnCollisionHit(const Actor& other)
+void Door::OnCollisionHit(Actor& other)
 {
     if (other.As<Player>())
     {

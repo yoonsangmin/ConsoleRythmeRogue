@@ -13,6 +13,21 @@ RythmeActor::RythmeActor(GameLevel* level, const wchar_t* str, const Vector2& po
     collisionEnabled = true;
 }
 
+void RythmeActor::TakeDamage(int damage)
+{
+    if (damage < 0)
+    {
+        return;
+    }
+
+    hp = hp - damage > 0 ? hp - damage : 0;
+
+    if (hp <= 0)
+    {
+        Destroy();
+    }
+}
+
 void RythmeActor::Move(EDirection::Flags direction)
 {
     int nextX = Position().x, nextY = Position().y;

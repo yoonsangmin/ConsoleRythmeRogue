@@ -2,6 +2,7 @@
 #include "Engine/Engine.h"
 #include "Level/GameLevel.h"
 #include "Actor/Maps/Stair.h"
+#include "Actor/Enemies/Enemy.h"
 
 Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
     : RythmeActor(level, str, position, hp, drawOrder, color)
@@ -67,7 +68,18 @@ void Player::Tick(float deltaTime)
     }
 }
 
-void Player::OnBeginOverlap(const Actor& other)
+void Player::OnCollisionHit(Actor& other)
+{
+    if (Enemy* enemy = other.As<Enemy>())
+    {
+        if (NextPosition() == enemy->Position() && IsMoving())
+        {
+            enemy->TakeDamage(1);
+        }
+    }
+}
+
+void Player::OnBeginOverlap(Actor& other)
 {
     if (other.As<Stair>())
     {

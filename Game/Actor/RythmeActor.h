@@ -73,6 +73,8 @@ public:
     RythmeActor() = delete;
     RythmeActor(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 0, const Color& color = Color::White);
 
+    virtual void TakeDamage(int damage = 1);
+
 protected:
     
     // 이동 함수.

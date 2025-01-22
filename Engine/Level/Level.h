@@ -16,6 +16,21 @@ public:
 
     // 액터 찾기.
     template<typename T>
+    inline void FindActorByClass(T*& out)
+    {
+        out = nullptr;
+        for (int ix = 0; ix < actors.Size(); ++ix)
+        {
+            T* actor = actors[ix]->As<T>();
+            if (actor && actors[ix]->IsActive())
+            {
+                out = actor;
+                return;
+            }
+        }
+    }
+
+    template<typename T>
     inline void FindAllActors(List<T*>& out)
     {
         for (int ix = 0; ix < actors.Size(); ++ix)

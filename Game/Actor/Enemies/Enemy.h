@@ -7,14 +7,16 @@ class Enemy : public RythmeActor
     RTTI_DECLARATIONS(Enemy, RythmeActor)
 
 public:
-    Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, int ticksPerMove = 2, int drawOrder = 10, const Color& color = Color::Red);
+    Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, const Color& color = Color::Red, int ticksPerMove = 2, int drawOrder = 10);
     ~Enemy();
 
     virtual void Tick(float deltaTime) override;
 
 protected:
     // 이동 방법 결정. 상속받은 적들 마다 다르게 구현.
-    virtual void DecideDirection();
+    virtual EDirection::Flags DecideDirection();
+
+    virtual void OnCollisionHit(Actor& other) override;
 
 protected:
 
@@ -28,6 +30,6 @@ protected:
     int tickCount = 0;
     const int ticksPerMove;
 
-    EDirection::Flags moveDirection = EDirection::East;
+    EDirection::Flags moveDirection = EDirection::None;
 
 };

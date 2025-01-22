@@ -59,6 +59,9 @@ public:
     // 화면 크기 반환 함수.
     inline Vector2 ScreenSize() const { return screenSize; }
 
+    // 현재 레벨 반환.
+    inline Level* GetMainLevel() const { return mainLevel; }
+
     // 타겟 프레임 속도 설정 함수.
     void SetTargetFrameRate(float targetFrameRate);
 

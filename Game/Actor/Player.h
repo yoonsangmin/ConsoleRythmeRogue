@@ -13,7 +13,8 @@ public:
 
     virtual void Tick(float deltaTime) override;
 
-    virtual void OnBeginOverlap(const Actor& other) override;
+    virtual void OnCollisionHit(Actor& other) override;
+    virtual void OnBeginOverlap(Actor& other) override;
 
 private:
     

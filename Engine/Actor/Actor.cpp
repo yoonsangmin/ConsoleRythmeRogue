@@ -86,7 +86,7 @@ bool Actor::Intersect(const Actor& other)
     return nextPosition.y == other.nextPosition.y;
 }
 
-void Actor::OnCollisionHit(const Actor& other)
+void Actor::OnCollisionHit(Actor& other)
 {
 }
 
@@ -121,10 +121,10 @@ void Actor::ProcessNewOverlapActors()
     newOverlapActors.Clear();
 }
 
-void Actor::OnBeginOverlap(const Actor& other)
+void Actor::OnBeginOverlap(Actor& other)
 {
 }
 
-void Actor::OnEndOverlap(const Actor& other)
+void Actor::OnEndOverlap(Actor& other)
 {
 }

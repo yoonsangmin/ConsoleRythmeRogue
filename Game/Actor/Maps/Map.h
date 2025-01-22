@@ -47,6 +47,7 @@ public:
     void ClearRooms();
 
     inline Room GetRoomInfo(int index) { return rooms[index]; }
+    inline int RoomsCount(int index) { return rooms.Size(); }
 
 private:
     bool CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight);

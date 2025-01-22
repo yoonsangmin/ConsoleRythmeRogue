@@ -30,7 +30,7 @@
     <ClCompile Include="Actor\Enemies\Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Enemies\StationaryEnemy.cpp">
+    <ClCompile Include="Actor\Enemies\RandomEnemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Actor\Enemies\PatrollingEnemy.cpp">
@@ -71,7 +71,7 @@
     <ClInclude Include="Actor\Enemies\Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Enemies\StationaryEnemy.h">
+    <ClInclude Include="Actor\Enemies\RandomEnemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Enemies\PatrollingEnemy.h">

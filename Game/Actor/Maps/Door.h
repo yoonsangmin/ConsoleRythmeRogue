@@ -9,5 +9,5 @@ class Door : public Actor
 public:
     Door(const Vector2& position);
 
-    virtual void OnCollisionHit(const Actor& other) override;
+    virtual void OnCollisionHit(Actor& other) override;
 };

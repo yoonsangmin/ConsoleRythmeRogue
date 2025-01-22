@@ -1,7 +1,8 @@
 ﻿#include "Enemy.h"
 #include "Level/GameLevel.h"
+#include "Actor/Player.h"
 
-Enemy::Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp, int ticksPerMove, int drawOrder, const Color& color)
+Enemy::Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, int ticksPerMove, int drawOrder)
     : RythmeActor(level, str, position, hp, drawOrder, color), ticksPerMove(ticksPerMove)
 {
     // 이름 문자열 복사.
@@ -32,7 +33,7 @@ void Enemy::Tick(float deltaTime)
     if (tickCount >= ticksPerMove)
     {
         tickCount %= ticksPerMove;
-        DecideDirection();
+        moveDirection = DecideDirection();
         canMove = true;
     }
 
@@ -43,8 +44,18 @@ void Enemy::Tick(float deltaTime)
     }
 }
 
-void Enemy::DecideDirection()
+EDirection::Flags Enemy::DecideDirection()
 {
-    // moveDirection = EDirection::Random8Direction();
-    moveDirection = EDirection::East;
+    return EDirection::None;
+}
+
+void Enemy::OnCollisionHit(Actor& other)
+{
+    if (Player* player = other.As<Player>())
+    {
+        if (NextPosition() == player->Position() && IsMoving())
+        {
+            player->TakeDamage(1);
+        }
+    }
 }

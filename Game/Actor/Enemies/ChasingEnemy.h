@@ -6,7 +6,15 @@ class ChasingEnemy : public Enemy
 {
     RTTI_DECLARATIONS(ChasingEnemy, Enemy)
 
-protected:
-    virtual void DecideDirection() override;
+public:
+    ChasingEnemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, const Color& color = Color::Red, bool is4DirectionRandom = true, int ticksPerMove = 2, int drawOrder = 10);
 
+    virtual void BeginPlay() override;
+
+protected:
+    virtual EDirection::Flags DecideDirection() override;
+
+    class Player* player = nullptr;
+
+    bool is4DirectionRandom;
 };

@@ -45,7 +45,7 @@ private:
     static constexpr bool CollisionMatrix[Max][Max] = {
         {false, true,  true,  false,  false,  true},      // Player는 Wall, Enemy, Door와 충돌.
         {true,  false, true,  false,  false,  false},     // Wall는 Player, Enemy와 충돌.
-        {true,  true,  false, false,  false,  false},     // Enemy는 Wall, Player와 충돌.
+        {true,  true,  true, false,  false,  false},      // Enemy는 Wall, Enemy, Player와 충돌.
         {false,  false,  false,  false, false,  false},   // Effect는 아무것도 충돌하지 않음.
         {false,  false,  false,  false,  false, false},   // Item는 아무것도 충돌하지 않음.
         {true,  false,  true,  false,  false,  false}     // Door는 Player, Enemy와 충돌.
@@ -94,20 +94,21 @@ public:
     bool Intersect(const Actor& other);
 
     // 충돌 처리 함수.
-    virtual void OnCollisionHit(const Actor& other);
+    virtual void OnCollisionHit(Actor& other);
 
     // 오버랩 업데이트.
     void AddNewOverlapActor(Actor* newOverlapActor);
     void ProcessNewOverlapActors();
 
     // 오버랩 처리 함수.
-    virtual void OnBeginOverlap(const Actor& other);
-    virtual void OnEndOverlap(const Actor& other);
+    virtual void OnBeginOverlap(Actor& other);
+    virtual void OnEndOverlap(Actor& other);
 
     // Getter/Setter.
     // 위치 강제 이동.
     inline void WarpPosition(const Vector2& newPosition) { position = newPosition, nextPosition = newPosition; };
     inline Vector2 Position() const { return position; }
+    inline Vector2 NextPosition() const { return nextPosition; }
     inline bool IsActive() const { return isActive && !isExpired; }
     inline void SetActive(bool active) { isActive = active; }
     inline void Destroy() { isExpired = true; }
