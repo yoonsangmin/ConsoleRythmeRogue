@@ -2,8 +2,8 @@
 #include "Level/GameLevel.h"
 #include "Actor/Player.h"
 
-Enemy::Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, int ticksPerMove, int drawOrder)
-    : RythmeActor(level, str, position, hp, drawOrder, color), ticksPerMove(ticksPerMove)
+Enemy::Enemy(GameLevel* refLevel, const char* name, const wchar_t* str, const Vector2& position, int hp, const Color& color, int ticksPerMove, int drawOrder)
+    : RythmeActor(refLevel, str, position, hp, drawOrder, color), ticksPerMove(ticksPerMove)
 {
     // 이름 문자열 복사.
     auto length = strlen(name) + 1;

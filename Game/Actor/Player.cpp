@@ -4,8 +4,8 @@
 #include "Actor/Maps/Stair.h"
 #include "Actor/Enemies/Enemy.h"
 
-Player::Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
-    : RythmeActor(level, str, position, hp, drawOrder, color)
+Player::Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
+    : RythmeActor(refLevel, str, position, hp, drawOrder, color)
 {
     inputToleranceRangeX = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
     inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;

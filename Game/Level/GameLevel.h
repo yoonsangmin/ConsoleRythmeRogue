@@ -35,11 +35,11 @@ private:
     Vector2 gameScreen[2];
 
     // UI 스크린.
-    float uiScreenRatio = 0.1f;
+    float uiScreenRatio = 0.2f;
     Vector2 uiScreen[2];
 
     // 비트 표시 스크린.
-    float beatScreenRatio = 0.1;
+    float beatScreenRatio = 0.1f;
     Vector2 beatScreen[2];
     
     // 맵 정보.

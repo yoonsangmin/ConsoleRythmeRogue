@@ -4,18 +4,23 @@
 #include "Door.h" 
 #include "Corridor.h" 
 #include "Stair.h" 
+#include "Actor/Player.h"
+#include "Actor/Enemies/Enemy.h"
+#include "Actor/Enemies/RandomEnemy.h"
+#include "Actor/Enemies/PatrollingEnemy.h"
+#include "Actor/Enemies/ChasingEnemy.h"
 
 #include "Engine/Engine.h" 
 
 #include <map>
 #include <set>
 
-Map::Map(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize)
+Map::Map(GameLevel* refLevel)
+    : refLevel(refLevel)
 {
-    CreateRooms(screenMin, screenMax, targetCount, maxRoomSize);
 }
 
-void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize)
+void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize, float enemySpawnCapability, int enemyMaxPerRoom)
 {
     ClearRooms();
 
@@ -48,6 +53,12 @@ void Map::CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int ta
     
     // 벽 생성.
     SpawnWalls();
+
+    // 적 생성.
+    CreateEnemies(enemySpawnCapability, enemyMaxPerRoom);
+    
+    // 플레이어 생성.
+    SpawnPlayer();
 }
 
 bool Map::CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight)
@@ -73,6 +84,27 @@ bool Map::CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int
     }
 
     return false;
+}
+
+void Map::CreateEnemiesToRoom(float enemySpawnCapability, int attemptSize, int roomIndex)
+{
+    for (int ix = 0; ix < attemptSize; ++ix)
+    {
+        float random = RandomPercent(0.0f, 1.0f);
+
+        // 생성 안 함.
+        if (enemySpawnCapability < random)
+        {
+            continue;
+        }
+
+        int randomX = Random(rooms[roomIndex].Left(), rooms[roomIndex].Right());
+        int randomY = Random(rooms[roomIndex].Top(), rooms[roomIndex].Bottom());
+        // X축은 짝수 자리로 만들기.
+        randomX = randomX & 1 ? randomX - 1 : randomX;
+
+        TrySpawnRandomEnemyAt(randomX, randomY, roomIndex);
+    }
 }
 
 void Map::ClearRooms()
@@ -103,6 +135,25 @@ void Map::ClearRooms()
 
     mapPositions.clear();
     objectPositions.clear();
+}
+
+void Map::CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom)
+{
+    for (int ix = 1; ix < rooms.Size(); ++ix)
+    {
+        // 생성.
+        CreateEnemiesToRoom(enemySpawnCapability, enemyMaxPerRoom, ix);
+    }
+}
+
+void Map::SpawnPlayer()
+{
+    if (rooms.Size() == 0)
+    {
+        return;
+    }
+
+    Engine::Get().SpawnActor<Player>(refLevel, L"🚶", rooms[0].Center());
 }
 
 void Map::SpawnFloor()
@@ -449,9 +500,9 @@ void Map::TrySpawnFloorAt(int x, int y, int roomIndex)
     if (!mapPositions.count({ x, y }))
     {
         Actor* actor = Engine::Get().SpawnActor<Floor>(Vector2(x, y));
-        mapPositions.insert({ x, y });
         if (Floor* floor = actor->As<Floor>())
         {
+            mapPositions.insert({ x, y });
             if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
             {
                 roomActors[roomIndex].push_back(floor);
@@ -465,9 +516,9 @@ void Map::TrySpawanCorridorAt(int x, int y)
     if (!mapPositions.count({ x, y }))
     {
         Actor* actor = Engine::Get().SpawnActor<Corridor>(Vector2(x, y));
-        mapPositions.insert({ x, y });
         if (Corridor* corridor = actor->As<Corridor>())
         {
+            mapPositions.insert({ x, y });
             corridors.PushBack(corridor);
         }
     }
@@ -478,9 +529,9 @@ void Map::TrySpawnDoorAt(int x, int y, int roomIndex)
     if (!objectPositions.count({ x, y }))
     {
         Actor* actor = Engine::Get().SpawnActor<Door>(Vector2(x, y));
-        objectPositions.insert({ x, y });
         if (Door* door = actor->As<Door>())
         {
+            objectPositions.insert({ x, y });
             if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
             {
                 roomActors[roomIndex].push_back(door);
@@ -494,10 +545,9 @@ void Map::TrySpawnWallAt(int x, int y, int roomIndex)
     if (!mapPositions.count({ x, y }))
     {
         Actor* actor = Engine::Get().SpawnActor<Wall>(Vector2(x, y));
-        mapPositions.insert({ x, y });
-
         if (Wall* wall = actor->As<Wall>())
         {
+            mapPositions.insert({ x, y });
             if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
             {
                 roomActors[roomIndex].push_back(wall);
@@ -507,6 +557,41 @@ void Map::TrySpawnWallAt(int x, int y, int roomIndex)
             {
                 wall->SetVisible(false);
                 corridorWalls.PushBack(wall);
+            }
+        }
+    }
+}
+
+void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
+{
+    if (!objectPositions.count({ x, y }))
+    {
+        Actor* actor = nullptr;
+
+        int random = Random(0, 3);
+        switch (random)
+        {
+        case 0:
+            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, "박쥐", L"🦇", Vector2(x, y), 2, Color::Blue);
+            break;
+        case 1:
+            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, "유령", L"👻", Vector2(x, y), 1, Color::White);
+            break;
+        case 2:
+            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, "로봇", L"🤖", Vector2(x, y), 2, Color::BrightMagenta);
+            break;
+        case 3:    
+        default:
+            actor = Engine::Get().SpawnActor<Enemy>(refLevel, "수호자", L"🗿", Vector2(x, y), 3, Color::BrightYellow);
+            break;
+        }
+
+        if (actor != nullptr)
+        {
+            objectPositions.insert({ x, y });
+            if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
+            {
+                roomActors[roomIndex].push_back(actor);
             }
         }
     }

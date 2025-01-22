@@ -1,21 +1,11 @@
 ﻿#include "GameLevel.h"
 #include "Actor/Player.h"
-#include "Actor/Enemies/Enemy.h"
-#include "Actor/Enemies/RandomEnemy.h"
-#include "Actor/Enemies/PatrollingEnemy.h"
-#include "Actor/Enemies/ChasingEnemy.h"
 #include "Engine/Engine.h"
 #include "Actor/Maps/Map.h"
 
 GameLevel::GameLevel(float tickPerSecond)
     : tickPerSecond(tickPerSecond)
 {
-    // 적 생성 테스트.
-    Engine::Get().SpawnActor<Enemy>(this, "박쥐", L"🦇", Vector2(10, 8));
-    Engine::Get().SpawnActor<PatrollingEnemy>(this, "박쥐", L"🦇", Vector2(10, 6));
-    Engine::Get().SpawnActor<RandomEnemy>(this, "박쥐", L"🦇", Vector2(10, 4));
-    Engine::Get().SpawnActor<ChasingEnemy>(this, "박쥐", L"🦇", Vector2(10, 10));
-
     // 공간 나누기.
     Vector2 screenSize = Engine::Get().ScreenSize();
     int tempX, tempY;
@@ -39,8 +29,8 @@ void GameLevel::BeginPlay()
 {
     Super::BeginPlay();
 
-    map = new Map(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
-    Engine::Get().SpawnActor<Player>(this, L"🚶", Vector2(0, 0));// map->GetRoomInfo(0).Center());
+    map = new Map(this);
+    map->CreateRooms(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
 }
 
 void GameLevel::Tick(float deltaTime)

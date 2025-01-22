@@ -45,7 +45,7 @@ private:
     static constexpr bool CollisionMatrix[Max][Max] = {
         {false, true,  true,  false,  false,  true},      // Player는 Wall, Enemy, Door와 충돌.
         {true,  false, true,  false,  false,  false},     // Wall는 Player, Enemy와 충돌.
-        {true,  true,  true, false,  false,  false},      // Enemy는 Wall, Enemy, Player와 충돌.
+        {true,  true,  true, false,  false,  true},       // Enemy는 Wall, Enemy, Player, Door와 충돌.
         {false,  false,  false,  false, false,  false},   // Effect는 아무것도 충돌하지 않음.
         {false,  false,  false,  false,  false, false},   // Item는 아무것도 충돌하지 않음.
         {true,  false,  true,  false,  false,  false}     // Door는 Player, Enemy와 충돌.

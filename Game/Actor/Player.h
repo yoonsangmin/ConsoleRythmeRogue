@@ -9,7 +9,7 @@ class Player : public RythmeActor
     RTTI_DECLARATIONS(Player, RythmeActor)
 
 public:
-    Player(GameLevel* level, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 10, const Color& color = Color::White);
+    Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp = 6, int drawOrder = 10, const Color& color = Color::BrightWhite);
 
     virtual void Tick(float deltaTime) override;
 

@@ -7,7 +7,7 @@ class Enemy : public RythmeActor
     RTTI_DECLARATIONS(Enemy, RythmeActor)
 
 public:
-    Enemy(GameLevel* level, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, const Color& color = Color::Red, int ticksPerMove = 2, int drawOrder = 10);
+    Enemy(GameLevel* gameLevel, const char* name, const wchar_t* str, const Vector2& position, int hp = 1, const Color& color = Color::Red, int ticksPerMove = 2, int drawOrder = 10);
     ~Enemy();
 
     virtual void Tick(float deltaTime) override;

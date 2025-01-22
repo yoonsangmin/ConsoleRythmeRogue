@@ -33,6 +33,7 @@ struct Room
     int height;
 };
 
+class GameLevel;
 class Actor;
 class Corridor;
 class Wall;
@@ -41,16 +42,21 @@ class Map : public RTTI
     RTTI_DECLARATIONS(Map, RTTI)
    
 public:
-    Map(const Vector2& screenMin, const Vector2& screenMax, int targetCount = 5, const Vector2& maxRoomSize = Vector2(10, 5));
+    Map() = delete;
+    Map(GameLevel* refLevel);
 
-    void CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize);
+    void CreateRooms(const Vector2& screenMin, const Vector2& screenMax, int targetCount = 5, const Vector2& maxRoomSize = Vector2(10, 5), float enemySpawnCapability = 0.7f, int enemyMaxPerRoom = 3);
     void ClearRooms();
+
+    void CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom);
+    void SpawnPlayer();
 
     inline Room GetRoomInfo(int index) { return rooms[index]; }
     inline int RoomsCount(int index) { return rooms.Size(); }
 
 private:
     bool CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight);
+    void CreateEnemiesToRoom(float enemySpawnCapability, int attemptSize, int roomIndex);
 
     void SpawnFloor();
     void SpawanAllCorridorsAndDoors();
@@ -62,8 +68,11 @@ private:
     void TrySpawanCorridorAt(int x, int y);
     void TrySpawnDoorAt(int x, int y, int roomIndex);
     void TrySpawnWallAt(int x, int y, int roomIndex = -1);
+    void TrySpawnRandomEnemyAt(int x, int y, int roomIndex);
 
 private:
+    GameLevel* refLevel;
+
     const int MIN_WIDTH = 8;
     const int MIN_HEIGHT = 2;
     const int MAX_ATTEMP = 100;
