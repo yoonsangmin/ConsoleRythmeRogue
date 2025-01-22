@@ -78,7 +78,7 @@ public:
 protected:
     
     // 이동 함수.
-    void Move(EDirection::Flags direction);
+    virtual void Move(EDirection::Flags direction);
 
 protected:
 

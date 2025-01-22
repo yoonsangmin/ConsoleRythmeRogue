@@ -110,14 +110,14 @@ public:
     inline Vector2 Position() const { return position; }
     inline Vector2 NextPosition() const { return nextPosition; }
     inline bool IsActive() const { return isActive && !isExpired; }
-    inline void SetActive(bool active) { isActive = active; }
+    inline void SetActive(bool active) { isActive = active; SetVisibility(false); }
     inline void Destroy() { isExpired = true; }
     inline int Width() const { return width; }
     inline bool IsVisible() const { return isVisible; }
-    inline void SetVisible(bool value) { isVisible = value; }
-    inline bool IsCollisionEnabled() const { return collisionEnabled; }
+    inline void SetVisibility(bool value) { isVisible = value; }
+    inline bool IsCollisionEnabled() const { return IsActive() && collisionEnabled; }
     inline void SetCollisionEnabled(bool value) { collisionEnabled = value; }
-    inline bool IsOverlapEnabled() const { return overlapEnabled; }
+    inline bool IsOverlapEnabled() const { return IsActive() && overlapEnabled; }
     inline void SetOverlapEnabled(bool value) { overlapEnabled = value; }
     inline bool IsStatic() const { return isStatic; }
     inline bool IsMovable() const { return !isStatic; }

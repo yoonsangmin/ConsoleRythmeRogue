@@ -1,7 +1,9 @@
 ﻿#include "Player.h"
 #include "Engine/Engine.h"
 #include "Level/GameLevel.h"
+#include "Actor/Maps/Map.h"
 #include "Actor/Maps/Stair.h"
+#include "Actor/Maps/Floor.h"
 #include "Actor/Enemies/Enemy.h"
 
 Player::Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
@@ -83,7 +85,15 @@ void Player::OnBeginOverlap(Actor& other)
 {
     if (other.As<Stair>())
     {
-        // 방 내려가기 구현.
-        SetPosition(Vector2(0, 0));
+        // 방 내려가기.
+        refLevel->GenerateMap();
+        return;
     }
+}
+
+void Player::Move(EDirection::Flags direction)
+{
+    Super::Move(direction);
+
+    refLevel->GetMap()->CheckNextPlayerPosition(NextPosition().x, NextPosition().y);
 }

@@ -12,6 +12,6 @@ void Door::OnCollisionHit(Actor& other)
 {
     if (other.As<Player>())
     {
-        Destroy();
+        SetActive(false);
     }
 }

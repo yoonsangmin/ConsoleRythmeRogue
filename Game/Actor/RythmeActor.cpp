@@ -24,7 +24,7 @@ void RythmeActor::TakeDamage(int damage)
 
     if (hp <= 0)
     {
-        Destroy();
+        SetActive(false);
     }
 }
 

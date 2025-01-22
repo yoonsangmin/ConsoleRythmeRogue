@@ -25,12 +25,17 @@ GameLevel::GameLevel(float tickPerSecond)
     gameScreen[1] = { tempX, tempY };
 }
 
+GameLevel::~GameLevel()
+{
+    delete map;
+}
+
 void GameLevel::BeginPlay()
 {
     Super::BeginPlay();
 
     map = new Map(this);
-    map->InitializeMap(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
+    GenerateMap();
 }
 
 void GameLevel::Tick(float deltaTime)
@@ -61,4 +66,11 @@ void GameLevel::Draw()
         Engine::Get().Draw(Vector2(reverseX, y), L"｜");
         Engine::Get().Draw(Vector2(reverseX, y), L"｜");
     }
+}
+
+void GameLevel::GenerateMap()
+{
+    map->ClearRooms();
+
+    map->InitializeMap(gameScreen[0], gameScreen[1], 6, Vector2(20, 8));
 }

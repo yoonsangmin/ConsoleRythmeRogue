@@ -35,6 +35,7 @@ struct Room
 
 class GameLevel;
 class Actor;
+class Player;
 class Corridor;
 class Wall;
 class Map : public RTTI
@@ -51,6 +52,10 @@ public:
     void SpawnStair();
     void CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom);
     void SpawnPlayer();
+    void SetVisibilityToAllActors(bool value);
+    void SetVisibilityToRoom(bool value, int roomIndex);
+
+    void CheckNextPlayerPosition(int x, int y);
 
     inline Room GetRoomInfo(int index) { return rooms[index]; }
     inline int RoomsCount(int index) { return rooms.Size(); }
@@ -74,6 +79,7 @@ private:
 
 private:
     GameLevel* refLevel;
+    Player* player = nullptr;
 
     const int MIN_WIDTH = 8;
     const int MIN_HEIGHT = 2;
@@ -81,17 +87,20 @@ private:
     const int ROOM_SPACING = 3;
 
     List<Room> rooms;
-    //TODO: 사용하나?
-    List<Actor*> objects;
 
     // 각 방마다의 액터들.
     std::vector<std::vector<Actor*>> roomActors;
     // 통로 액터들.
     List<Corridor*> corridors;
+    // 안 보이는 복도 벽.
     List<Wall*> corridorWalls;
+    // 에너미, 문.
+    List<Actor*> objects;
 
     // 중복 생성 방지.
     std::set<std::pair<int, int>> mapPositions;
     std::set<std::pair<int, int>> objectPositions;
 
+    // 방 불 켜졌는지.
+    std::set<int> litRooms;
 };

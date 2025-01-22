@@ -12,16 +12,18 @@ class GameLevel : public Level
 
 public:
     GameLevel(float tickPerSecond = 0.5f);
+    ~GameLevel();
 
     virtual void BeginPlay() override;
     virtual void Tick(float deltaTime) override;
     virtual void Draw() override;
 
+    // 방 생성.
+    void GenerateMap();
+
     // Getter.
-    inline float GetTickTimer() const
-    { 
-        return tickTimer;
-    }
+    inline float GetTickTimer() const { return tickTimer; }
+    inline Map* GetMap() { return map; }
     
 public:
     // 80BPM - 1비트에 60/80초 - 0.75초.
@@ -43,6 +45,6 @@ private:
     Vector2 beatScreen[2];
     
     // 맵 정보.
-    Map* map;
+    Map* map = nullptr;
 
 };

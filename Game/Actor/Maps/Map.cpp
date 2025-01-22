@@ -22,7 +22,11 @@ Map::Map(GameLevel* refLevel)
 
 void Map::InitializeMap(const Vector2& screenMin, const Vector2& screenMax, int targetCount, const Vector2& maxRoomSize, float enemySpawnCapability, int enemyMaxPerRoom)
 {
-    ClearRooms();
+    // 맵이 이미 있는 경우 생성 중단.
+    if (rooms.Size() != 0)
+    {
+        return;
+    }
 
     int maxRoomSizeX = maxRoomSize.x < MIN_WIDTH ? MIN_WIDTH : maxRoomSize.x;
     int maxRoomSizeY = maxRoomSize.y < MIN_HEIGHT ? MIN_HEIGHT : maxRoomSize.y;
@@ -62,6 +66,12 @@ void Map::InitializeMap(const Vector2& screenMin, const Vector2& screenMax, int 
     
     // 플레이어 생성.
     SpawnPlayer();
+
+    // 모두 가리기.
+    SetVisibilityToAllActors(false);
+
+    // 시작방 불 켜기.
+    SetVisibilityToRoom(true, 0);
 }
 
 bool Map::CreateRoom(int maxRoomSizeX, int maxRoomSizeY, int mapX, int mapY, int mapWidth, int mapHeight)
@@ -135,9 +145,12 @@ void Map::ClearRooms()
     roomActors.clear();
     corridors.Clear();
     corridorWalls.Clear();
+    objects.Clear();
 
     mapPositions.clear();
     objectPositions.clear();
+
+    litRooms.clear();
 }
 
 void Map::SpawnStair()
@@ -168,7 +181,92 @@ void Map::SpawnPlayer()
         return;
     }
 
-    Engine::Get().SpawnActor<Player>(refLevel, L"🚶", rooms[0].Center());
+    Vector2 spawnPosition = rooms[0].Center();
+    // 짝수 칸으로 옮기기.
+    spawnPosition.x = spawnPosition.x & 1 ? spawnPosition.x - 1 : spawnPosition.x;
+    if (player == nullptr)
+    {
+        player = Engine::Get().SpawnActor<Player>(refLevel, L"🚶", spawnPosition)->As<Player>();
+    }
+    else
+    {
+        player->WarpPosition(spawnPosition);
+    }
+}
+
+void Map::SetVisibilityToAllActors(bool value)
+{
+    // 방 불 끄기.
+    for (auto& actors : roomActors)
+    {
+        for (auto& actor : actors)
+        {
+            actor->SetVisibility(value);
+        }
+    }
+
+    litRooms.clear();
+
+    // 복도 불 끄기.
+    for (auto& corridor : corridors)
+    {
+        corridor->SetVisibility(value);
+    }
+}
+
+void Map::SetVisibilityToRoom(bool value, int roomIndex)
+{
+    if (litRooms.count(roomIndex))
+    {
+        return;
+    }
+
+    for (auto& actor : roomActors[roomIndex])
+    {
+        actor->SetVisibility(value);
+    }
+
+    litRooms.insert(roomIndex);
+}
+
+void Map::CheckNextPlayerPosition(int x, int y)
+{
+    for (int ix = 1; ix < roomActors.size(); ++ix)
+    {
+        for (auto& actor : roomActors[ix])
+        {
+            if (Floor* floor = actor->As<Floor>())
+            {
+                if (floor->Position().x == x && floor->Position().y == y)
+                {
+                    SetVisibilityToRoom(true, ix);
+                    return;
+                }
+            }
+        }
+    }
+
+    for (auto& object : objects)
+    {
+        // 맨해튼 거리.
+        int distance = std::abs((object->Position().x - x) / 2) + std::abs(object->Position().y - y);
+
+        if (distance <= 1)
+        {
+            object->SetVisibility(true);
+        }
+    }
+
+    for (auto& corridor : corridors)
+    {
+        // 맨해튼 거리.
+        int distance = std::abs((corridor->Position().x - x) / 2) + std::abs(corridor->Position().y - y);
+
+        if (distance <= 1)
+        {
+            corridor->SetVisibility(true);
+        }
+    }
 }
 
 void Map::SpawnFloor()
@@ -550,6 +648,7 @@ void Map::TrySpawnDoorAt(int x, int y, int roomIndex)
             if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
             {
                 roomActors[roomIndex].push_back(door);
+                objects.PushBack(door);
             }
         }
     }
@@ -590,7 +689,7 @@ void Map::TrySpawnWallAt(int x, int y, int roomIndex)
             // 복도용 벽.
             else
             {
-                wall->SetVisible(false);
+                wall->SetVisibility(false);
                 corridorWalls.PushBack(wall);
             }
         }
@@ -627,6 +726,7 @@ void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
             if (roomActors.size() != 0 && roomIndex < roomActors.size() && roomIndex >= 0)
             {
                 roomActors[roomIndex].push_back(actor);
+                objects.PushBack(actor);
             }
         }
     }

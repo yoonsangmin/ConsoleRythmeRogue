@@ -16,6 +16,8 @@ public:
     virtual void OnCollisionHit(Actor& other) override;
     virtual void OnBeginOverlap(Actor& other) override;
 
+    virtual void Move(EDirection::Flags direction) override;
+
 private:
     
     // 입력 허용 범위. 0.5를 넘으면 안 됨.
