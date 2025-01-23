@@ -221,33 +221,34 @@ void GameLevel::DrawEnemyUI()
 
     int count = 0;
     int index = 0;
-    while (count < wcslen(enemy->GetName()) && index < 255)
-    {
-        buffer[index] = enemy->GetName()[count];
-        ++count;
-        ++index;
-        if (Is4ByteUTF16(enemy->GetName()[count]))
-        {
-            buffer[index] = enemy->GetName()[count];
-            ++count;
-            ++index;
-        }
+    //while (count < wcslen(enemy->GetName()) && index < 255)
+    //{
+    //    buffer[index] = enemy->GetName()[count];
+    //    ++count;
+    //    ++index;
+    //    if (Is4ByteUTF16(enemy->GetName()[count]))
+    //    {
+    //        buffer[index] = enemy->GetName()[count];
+    //        ++count;
+    //        ++index;
+    //    }
 
-        // 한 칸 뛰기.
-        buffer[index] = L' ';
-        ++index;
+    //    // 한 칸 뛰기.
+    //    buffer[index] = L' ';
+    //    ++index;
 
-        if (count == refPlayer->GetHP())
-        {
-            buffer[index] = '\0';
-        }
-    }
-    if (count >= 255)
-    {
-        buffer[254] = '\0';
-    }
+    //    if (count == refPlayer->GetHP())
+    //    {
+    //        buffer[index] = '\0';
+    //    }
+    //}
+    //if (count >= 255)
+    //{
+    //    buffer[254] = '\0';
+    //}
 
-    Engine::Get().Draw(Vector2(x, y), buffer);
+    //Engine::Get().Draw(Vector2(x, y), buffer);
+    Engine::Get().Draw(Vector2(x, y), enemy->GetName());
 
     x = uiScreen[0].x;
     y = uiScreen[0].y + 10;
