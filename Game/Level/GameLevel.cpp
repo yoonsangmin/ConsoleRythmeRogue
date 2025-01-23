@@ -170,7 +170,7 @@ void GameLevel::DrawHPUI()
 
     int count = 0;
     int index = 0;
-    while (count < refPlayer->GetHP() / 2 && index < 255)
+    while (count < refPlayer->GetHP() && index < 255)
     {
         // 짝수 자리에만 찍기.
         if (index & 1)
@@ -183,17 +183,20 @@ void GameLevel::DrawHPUI()
         ++count;
         ++index;
 
-        if (count == refPlayer->GetHP() / 2)
+        if (count == refPlayer->GetHP())
         {
             buffer[index] = '\0';
+            Engine::Get().Draw(Vector2(x, y), buffer, Color::BrightRed);
+            break;
+        }
+        if (count % 5 == 0)
+        {
+            buffer[index] = '\0';
+            Engine::Get().Draw(Vector2(x, y), buffer, Color::BrightRed);
+            index = 0;
+            ++y;
         }
     }
-    if (count >= 255)
-    {
-        buffer[254] = '\0';
-    }
-    
-    Engine::Get().Draw(Vector2(x, y), buffer, Color::BrightRed);
 }
 
 void GameLevel::DrawEnemyUI()
@@ -215,48 +218,19 @@ void GameLevel::DrawEnemyUI()
     }
 
     int x = uiScreen[0].x;
-    int y = uiScreen[0].y + 8;
+    int y = uiScreen[0].y + 10;
     wchar_t buffer[255];
+    memset(buffer, 0, 255 * sizeof(wchar_t));
+
+    Engine::Get().Draw(Vector2(x, y), enemy->GetName());
+
+    x = uiScreen[0].x;
+    y = uiScreen[0].y + 12;
     memset(buffer, 0, 255 * sizeof(wchar_t));
 
     int count = 0;
     int index = 0;
-    //while (count < wcslen(enemy->GetName()) && index < 255)
-    //{
-    //    buffer[index] = enemy->GetName()[count];
-    //    ++count;
-    //    ++index;
-    //    if (Is4ByteUTF16(enemy->GetName()[count]))
-    //    {
-    //        buffer[index] = enemy->GetName()[count];
-    //        ++count;
-    //        ++index;
-    //    }
-
-    //    // 한 칸 뛰기.
-    //    buffer[index] = L' ';
-    //    ++index;
-
-    //    if (count == refPlayer->GetHP())
-    //    {
-    //        buffer[index] = '\0';
-    //    }
-    //}
-    //if (count >= 255)
-    //{
-    //    buffer[254] = '\0';
-    //}
-
-    //Engine::Get().Draw(Vector2(x, y), buffer);
-    Engine::Get().Draw(Vector2(x, y), enemy->GetName());
-
-    x = uiScreen[0].x;
-    y = uiScreen[0].y + 10;
-    memset(buffer, 0, 255 * sizeof(wchar_t));
-
-    count = 0;
-    index = 0;
-    while (count < enemy->GetHP() / 2 && index < 255)
+    while (count < enemy->GetHP() && index < 255)
     {
         // 짝수 자리에만 찍기.
         if (index & 1)
@@ -269,15 +243,18 @@ void GameLevel::DrawEnemyUI()
         ++count;
         ++index;
 
-        if (count == refPlayer->GetHP() / 2)
+        if (count == enemy->GetHP())
         {
             buffer[index] = '\0';
+            Engine::Get().Draw(Vector2(x, y), buffer, Color::Red);
+            break;
+        }
+        if (count % 5 == 0)
+        {
+            buffer[index] = '\0';
+            Engine::Get().Draw(Vector2(x, y), buffer, Color::Red);
+            index = 0;
+            ++y;
         }
     }
-    if (count >= 255)
-    {
-        buffer[254] = '\0';
-    }
-
-    Engine::Get().Draw(Vector2(x, y), buffer, Color::Red);
 }

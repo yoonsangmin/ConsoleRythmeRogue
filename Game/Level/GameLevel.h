@@ -50,7 +50,7 @@ private:
     Vector2 gameScreen[2];
 
     // UI 스크린.
-    float uiScreenRatio = 0.1f;
+    float uiScreenRatio = 0.12f;
     Vector2 uiScreen[2];
 
     // 비트 표시 스크린.
