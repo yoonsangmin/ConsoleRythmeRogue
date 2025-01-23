@@ -26,6 +26,7 @@ public:
     void PlayerDead();
 
     // Getter.
+    inline float GetTickPerSecond() const { return tickPerSecond; }
     inline float GetTickTimer() const { return tickTimer; }
     inline Map* GetMap() { return map; }
     inline bool IsClear() { return isClear; }
@@ -38,11 +39,13 @@ private:
     void DrawEnemyUI();
 
 public:
+
+
+private:
+
     // 80BPM - 1비트에 60/80초 - 0.75초.
     // 120BPM - 1비트에 60/120초 - 0.5초.
     const float tickPerSecond;
-
-private:
 
     float tickTimer = 0;
 

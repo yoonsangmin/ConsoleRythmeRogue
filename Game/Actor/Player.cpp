@@ -9,8 +9,8 @@
 Player::Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp, int drawOrder, const Color& color)
     : RythmeActor(refLevel, str, position, hp, drawOrder, color)
 {
-    inputToleranceRangeX = refLevel->tickPerSecond - refLevel->tickPerSecond * inputTolerance;
-    inputToleranceRangeY = refLevel->tickPerSecond * inputTolerance;
+    inputToleranceRangeX = refLevel->GetTickPerSecond() - refLevel->GetTickPerSecond() * inputTolerance;
+    inputToleranceRangeY = refLevel->GetTickPerSecond() * inputTolerance;
 
     overlapEnabled = true;
     collisionType = ECollision::Player;
@@ -32,7 +32,7 @@ void Player::Tick(float deltaTime)
     }
 
     // 리듬에 맞춰 이동.
-    float halfTPS = refLevel->tickPerSecond / 2;
+    float halfTPS = refLevel->GetTickPerSecond() / 2;
     if (canMove
         && ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() >= inputToleranceRangeX)
         || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() <= inputToleranceRangeY)))

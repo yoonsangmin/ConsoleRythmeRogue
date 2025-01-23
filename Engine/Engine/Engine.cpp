@@ -407,10 +407,10 @@ void Engine::CheckCollision()
     // 충돌 처리.
     for (int ix = 0; ix < movableActors.Size(); ++ix)
     {
-        // 각 프레임에서 충돌 발생 여부를 추적.
-        bool collisionOccurred = false;
-        // 이동 중인 상태 체크. - 무한 루프 방지.
+        // 이동 중인 상태 체크.
         bool isMoving = movableActors[ix]->IsMoving();
+        // 포지션 되돌렸는지 확인.
+        bool isPositionRestored = false;
 
         // movableActors 충돌 처리.
         for (int jx = 0; jx < movableActors.Size(); ++jx)
@@ -429,21 +429,32 @@ void Engine::CheckCollision()
                 movableActors[ix]->OnCollisionHit(*movableActors[jx]);
                 movableActors[jx]->OnCollisionHit(*movableActors[ix]);
 
-                // 충돌이 발생했음을 기록.
-                collisionOccurred = true;
-
                 // 위치 되돌리기.
-                if (isMoving)
+                // 둘 중 하나도 안 움직였으면 스킵.
+                // 무한 루프 방지.
+                bool isOtherActorMoving = movableActors[jx]->IsMoving();
+                if (isMoving || isOtherActorMoving)
                 {
-                    movableActors[ix]->RestorePosition();
-                    // 위치 변경 발생. 루프 다시 처기하기 위해 탈출.
+                    if (isMoving)
+                    {
+                        movableActors[ix]->RestorePosition();
+                    }
+                    else if (isOtherActorMoving)
+                    {
+                        movableActors[jx]->RestorePosition();
+                    }
+
+                    // 위치 변경 후엔 루프를 다시 처리하기 위해 표시 후 탈출.
+                    // 되돌린 위치에 대해선 제대로 충돌처리가 안 됐기 때문.
+                    isPositionRestored = true;
                     break;
                 }
             }
         }
 
-        // 충돌이 발생했고 액터의 위치가 복원된 경우 다른 액터들에 대해 다시 처리해야 함.
-        if (collisionOccurred && isMoving)
+        // 충돌이 발생해 액터의 위치가 복원된 경우 다른 액터들에 대해 다시 처리해야 함.
+        // 되돌린 위치에 대해선 제대로 충돌처리가 안 됐기 때문.
+        if (isPositionRestored)
         {
             // -1로 설정하여 루프가 끝날 때 ++ix가 0부터 시작되도록 함.
             ix = -1;

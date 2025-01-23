@@ -92,7 +92,7 @@ void Actor::OnCollisionHit(Actor& other)
 
 void Actor::AddNewOverlapActor(Actor* newOverlapActor)
 {
-    newOverlapActors.PushBack(newOverlapActor);
+    newOverlapActors.insert(newOverlapActor);
 }
 
 void Actor::ProcessNewOverlapActors()
@@ -100,7 +100,7 @@ void Actor::ProcessNewOverlapActors()
     // 기존 오버랩된 액터들 중 더 이상 오버랩되지 않는 액터 처리.
     for (Actor* actor : overlappingActors)
     {
-        if (!newOverlapActors.Contains(actor))
+        if (!newOverlapActors.count(actor))
         {
             // 더 이상 오버랩되지 않음.
             OnEndOverlap(*actor);
@@ -110,7 +110,7 @@ void Actor::ProcessNewOverlapActors()
     // 기존 오버랩되지 않던 액터들 중 새로 오버랩된 액터 처리.
     for (Actor* actor : newOverlapActors)
     {
-        if (!overlappingActors.Contains(actor))
+        if (!overlappingActors.count(actor))
         {
             // 새로 오버랩 됨.
             OnBeginOverlap(*actor);
@@ -118,7 +118,7 @@ void Actor::ProcessNewOverlapActors()
     }
 
     overlappingActors = newOverlapActors;
-    newOverlapActors.Clear();
+    newOverlapActors.clear();
 }
 
 void Actor::OnBeginOverlap(Actor& other)

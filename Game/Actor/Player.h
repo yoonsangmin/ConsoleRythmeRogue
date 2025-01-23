@@ -27,7 +27,7 @@ public:
 private:
     
     // 입력 허용 범위. 0.5를 넘으면 안 됨.
-    float inputTolerance = 0.4f;
+    float inputTolerance = 0.45f;
     float inputToleranceRangeX;
     float inputToleranceRangeY;
 

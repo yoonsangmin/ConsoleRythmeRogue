@@ -5,6 +5,8 @@
 #include "Math/Vector2.h"
 #include "Container/List.h"
 
+#include <set>
+
 struct ECollision
 {
     typedef uint8_t Channel;
@@ -161,11 +163,14 @@ protected:
     // 콜리전 값.
     ECollision::Channel collisionType = ECollision::None;
 
+    // 이전 프레임에 충돌한 액터들.
+    std::set<Actor*> collidedActors;
+
     // 이전 프레임에 오버랩되고 있던 액터들.
-    List<Actor*> overlappingActors;
+    std::set<Actor*> overlappingActors;
 
     // 이번 프레임에 오버랩되는 액터들.
-    List<Actor*> newOverlapActors;
+    std::set<Actor*> newOverlapActors;
 
 private:
 
