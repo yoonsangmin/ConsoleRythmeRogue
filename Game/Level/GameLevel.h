@@ -60,7 +60,7 @@ private:
     // 맵 정보.
     Map* map = nullptr;
     int currentLevel = 1;
-    const int END_LEVEL = 5;
+    const int END_LEVEL = 3;
     bool isClear = false;
     bool isDead = false;
 

@@ -156,13 +156,40 @@ void Map::ClearRooms()
 void Map::SpawnStair()
 {
     Room& lastRoom = rooms[rooms.Size() - 1];
+    int x = 0;
+    int y = 0;
+    
+    bool canSpawn = false;
+    while (!canSpawn)
+    {
+        x = Random(lastRoom.Left(), lastRoom.Right());
+        y = Random(lastRoom.Top(), lastRoom.Bottom());
+        // X축은 짝수 자리로 만들기.
+        x = x & 1 ? x - 1 : x;
 
-    int randomX = Random(lastRoom.Left(), lastRoom.Right());
-    int randomY = Random(lastRoom.Top(), lastRoom.Bottom());
-    // X축은 짝수 자리로 만들기.
-    randomX = randomX & 1 ? randomX - 1 : randomX;
 
-    TrySpawnStairAt(randomX, randomY, rooms.Size() - 1);
+        int dx[] = { 0, 1, 0, -1 };
+        int dy[] = { 1, 0, -1, 0 };
+        canSpawn = true;
+        for (int ix = 0; ix < 4; ++ix)
+        {
+            for (auto& actor : roomActors[rooms.Size() - 1])
+            {
+                if (actor->As<Door>() && actor->Position().x == x + dx[ix] && actor->Position().y == y + dy[ix])
+                {
+                    canSpawn = false;
+                    break;
+                }
+            }
+
+            if (!canSpawn)
+            {
+                break;
+            }
+        }
+    }
+
+    TrySpawnStairAt(x, x, rooms.Size() - 1);
 }
 
 void Map::CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom)
@@ -654,7 +681,7 @@ void Map::TrySpawnDoorAt(int x, int y, int roomIndex)
     }
 }
 
-bool Map::TrySpawnStairAt(int x, int y, int roomIndex)
+void Map::TrySpawnStairAt(int x, int y, int roomIndex)
 {
     if (!objectPositions.count({ x, y }))
     {
@@ -666,12 +693,8 @@ bool Map::TrySpawnStairAt(int x, int y, int roomIndex)
             {
                 roomActors[roomIndex].push_back(stair);
             }
-            
-            return true;
         }
     }
-
-    return false;
 }
 
 void Map::TrySpawnWallAt(int x, int y, int roomIndex)
@@ -706,17 +729,17 @@ void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
         switch (random)
         {
         case 0:
-            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"박쥐", L"🦇", Vector2(x, y), 4, Color::Black);
+            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"BAT", L"🦇", Vector2(x, y), 4, Color::White);
             break;
         case 1:
-            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"유령", L"👻", Vector2(x, y), 4, Color::Black);
+            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"GHOST", L"👻", Vector2(x, y), 4, Color::Black);
             break;
         case 2:
-            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"로봇", L"🤖", Vector2(x, y), 4, Color::Black);
+            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"ROBOT", L"🤖", Vector2(x, y), 4, Color::BrightMagenta);
             break;
         case 3:    
         default:
-            actor = Engine::Get().SpawnActor<Enemy>(refLevel, L"수호자", L"🗿", Vector2(x, y), 6, Color::Black);
+            actor = Engine::Get().SpawnActor<Enemy>(refLevel, L"GUARDIAN", L"🗿", Vector2(x, y), 6, Color::BrightYellow);
             break;
         }
 

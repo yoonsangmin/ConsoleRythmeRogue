@@ -73,7 +73,7 @@ private:
     void TrySpawnFloorAt(int x, int y, int roomIndex);
     void TrySpawanCorridorAt(int x, int y);
     void TrySpawnDoorAt(int x, int y, int roomIndex);
-    bool TrySpawnStairAt(int x, int y, int roomIndex);
+    void TrySpawnStairAt(int x, int y, int roomIndex);
     void TrySpawnWallAt(int x, int y, int roomIndex = -1);
     void TrySpawnRandomEnemyAt(int x, int y, int roomIndex);
 
