@@ -14,6 +14,7 @@ public:
     Player(GameLevel* refLevel, const wchar_t* str, const Vector2& position, int hp = 10, int drawOrder = 10, const Color& color = Color::BrightWhite);
 
     virtual void Tick(float deltaTime) override;
+    virtual void Draw() override;
 
     virtual void OnCollisionHit(Actor& other) override;
     virtual void OnBeginOverlap(Actor& other) override;

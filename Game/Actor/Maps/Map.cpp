@@ -229,7 +229,7 @@ void Map::SetVisibilityToRoom(bool value, int roomIndex)
     litRooms.insert(roomIndex);
 }
 
-void Map::CheckNextPlayerPosition(int x, int y)
+void Map::CheckPlayerPosition(int x, int y)
 {
     for (int ix = 1; ix < roomActors.size(); ++ix)
     {
@@ -706,17 +706,17 @@ void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
         switch (random)
         {
         case 0:
-            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"박쥐", L"🦇", Vector2(x, y), 4, Color::Blue);
+            actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"박쥐", L"🦇", Vector2(x, y), 4, Color::Black);
             break;
         case 1:
-            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"유령", L"👻", Vector2(x, y), 4, Color::White);
+            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"유령", L"👻", Vector2(x, y), 4, Color::Black);
             break;
         case 2:
-            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"로봇", L"🤖", Vector2(x, y), 4, Color::BrightMagenta);
+            actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"로봇", L"🤖", Vector2(x, y), 4, Color::Black);
             break;
         case 3:    
         default:
-            actor = Engine::Get().SpawnActor<Enemy>(refLevel, L"수호자", L"🗿", Vector2(x, y), 6, Color::BrightYellow);
+            actor = Engine::Get().SpawnActor<Enemy>(refLevel, L"수호자", L"🗿", Vector2(x, y), 6, Color::Black);
             break;
         }
 

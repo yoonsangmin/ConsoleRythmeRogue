@@ -55,7 +55,7 @@ public:
     void SetVisibilityToAllActors(bool value);
     void SetVisibilityToRoom(bool value, int roomIndex);
 
-    void CheckNextPlayerPosition(int x, int y);
+    void CheckPlayerPosition(int x, int y);
 
     inline Room GetRoomInfo(int index) { return rooms[index]; }
     inline int RoomsCount(int index) { return rooms.Size(); }

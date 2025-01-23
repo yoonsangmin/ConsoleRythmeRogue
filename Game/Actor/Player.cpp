@@ -68,8 +68,9 @@ void Player::Tick(float deltaTime)
         }
     }
     // 틱이 지난 후. 이동 가능하도록 플래그 업데이트.
-    else if ((refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRangeX)
-        || (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRangeY))
+    else if (!canMove &&
+        (refLevel->GetTickTimer() > halfTPS && refLevel->GetTickTimer() < inputToleranceRangeX) ||
+        (refLevel->GetTickTimer() <= halfTPS && refLevel->GetTickTimer() > inputToleranceRangeY))
     {
         canMove = true;
     }
@@ -82,6 +83,14 @@ void Player::Tick(float deltaTime)
             lastHitEnemy = nullptr;
         }
     }
+}
+
+// 드로우가 실제 이동 후에 불림.
+void Player::Draw()
+{
+    Super::Draw();
+
+    refLevel->GetMap()->CheckPlayerPosition(Position().x, Position().y);
 }
 
 void Player::OnCollisionHit(Actor& other)
@@ -112,8 +121,6 @@ void Player::OnBeginOverlap(Actor& other)
 void Player::Move(EDirection::Flags direction)
 {
     Super::Move(direction);
-
-    refLevel->GetMap()->CheckNextPlayerPosition(NextPosition().x, NextPosition().y);
 }
 
 void Player::TakeDamage(int damage)

@@ -50,7 +50,7 @@ private:
     Vector2 gameScreen[2];
 
     // UI 스크린.
-    float uiScreenRatio = 0.2f;
+    float uiScreenRatio = 0.1f;
     Vector2 uiScreen[2];
 
     // 비트 표시 스크린.
@@ -60,7 +60,7 @@ private:
     // 맵 정보.
     Map* map = nullptr;
     int currentLevel = 1;
-    const int END_LEVEL = 2;
+    const int END_LEVEL = 5;
     bool isClear = false;
     bool isDead = false;
 

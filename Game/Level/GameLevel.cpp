@@ -86,7 +86,7 @@ void GameLevel::GoToNextLevel()
 void GameLevel::GenerateMap()
 {
     map->ClearRooms();
-    map->InitializeMap(gameScreen[0], gameScreen[1], 4, Vector2(15, 8));
+    map->InitializeMap(gameScreen[0], gameScreen[1], 8, Vector2(20, 6));
 }
 
 void GameLevel::PlayerDead()
@@ -139,7 +139,7 @@ void GameLevel::DrawLevelUI()
     }
     else
     {
-        swprintf(buffer, 255, L"현 재  층  : %d", currentLevel);
+        swprintf(buffer, 255, L"Floor: %d/%d", currentLevel, END_LEVEL);
     }
     Engine::Get().Draw(Vector2(x, y), buffer);
 }
