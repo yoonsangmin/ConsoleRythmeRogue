@@ -732,7 +732,7 @@ void Map::TrySpawnRandomEnemyAt(int x, int y, int roomIndex)
             actor = Engine::Get().SpawnActor<ChasingEnemy>(refLevel, L"BAT", L"🦇", Vector2(x, y), 2, Color::White);
             break;
         case 1:
-            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"GHOST", L"👻", Vector2(x, y), 1, Color::Black);
+            actor = Engine::Get().SpawnActor<RandomEnemy>(refLevel, L"GHOST", L"👻", Vector2(x, y), 2, Color::Black);
             break;
         case 2:
             actor = Engine::Get().SpawnActor<PatrollingEnemy>(refLevel, L"ROBOT", L"🤖", Vector2(x, y), 2, Color::BrightMagenta);
