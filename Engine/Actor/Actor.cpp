@@ -52,7 +52,7 @@ void Actor::RestorePosition()
     nextPosition = position;
 }
 
-bool Actor::IsMoving()
+bool Actor::IsMoving() const
 {
     return nextPosition != position;
 }
@@ -61,17 +61,55 @@ bool Actor::Intersect(const Actor& other)
 {
     // AABB(Axis Aligned Bounding Box).
 
+    // 대각선 이동인 경우.
+    if (position.x != nextPosition.x && position.y != nextPosition.y)
+    {
+        // x만 이동하는 경우 충돌하는지?
+        if (Intersect(Vector2(nextPosition.x, position.y), width, other.nextPosition, other.width))
+        {
+            return true;
+        }
+        // y만 이동하는 경우 충돌하는지?
+        if (Intersect(Vector2(position.x, nextPosition.y), width, other.nextPosition, other.width))
+        {
+            return true;
+        }
+    }
+    // 직선 이동인 경우.
+    // 또는 대각선 이동인데 사이에 장애물이 없는 경우.
+    // 또는 상대만 움직이는 경우.
     // 나의 다음 좌표랑 다른 액터의 다음 좌표 비교.
+    if (Intersect(nextPosition, width, other.nextPosition, other.width))
+    {
+        return true;
+    }
+
+    // 둘 다 움직이고 방향이 반대일 때 - 서로 자리가 바뀌는 경우.
+    if (IsMoving() && other.IsMoving()
+        && (nextPosition.x - position.x) * (other.nextPosition.x - other.position.x) <= 0
+        && (nextPosition.y - position.y) * (other.nextPosition.y - other.position.y) <= 0
+        )
+    {
+        // 방향이 반대인 경우 상대의 현재 위치와 겹치는지 확인.
+        return Intersect(nextPosition, width, other.position, other.width);
+    }
+
+    // 서로 충돌하지 않고 방향이 반대도 아님.
+    return false;
+}
+
+bool Actor::Intersect(Vector2 myPosition, int myWidth, Vector2 otherPosition, int otherWidth)
+{   
     // 내 x좌표 최소/최대.
-    int min = nextPosition.x;
-    int max = nextPosition.x + width - 1;
+    int min = myPosition.x;
+    int max = min + myWidth - 1;
 
     // 다른 액터의 x좌표 최소/최대.
-    int otherMin = other.nextPosition.x;
-    int otherMax = other.nextPosition.x + other.width - 1;
+    int otherMin = otherPosition.x;
+    int otherMax = otherMin + otherWidth - 1;
 
     // 다른 액터의 왼쪽 끝 위치가 내 오른쪽 끝 위치를 벗어나면 충돌 안 함.
-    if (otherMin > max)
+    if (otherMin > min)
     {
         return false;
     }
@@ -83,7 +121,7 @@ bool Actor::Intersect(const Actor& other)
     }
 
     // 위의 두 경우가 아니라면 (x좌표는 서로 겹침), y위치 비교.
-    return nextPosition.y == other.nextPosition.y;
+    return myPosition.y == otherPosition.y;
 }
 
 void Actor::OnCollisionHit(Actor& other)

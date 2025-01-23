@@ -90,10 +90,11 @@ public:
     // 이동에 사용할 함수.
     virtual void SetPosition(const Vector2& newPosition);
     virtual void RestorePosition();
-    virtual bool IsMoving();
+    virtual bool IsMoving() const;
 
     // 충돌 확인 함수.
     bool Intersect(const Actor& other);
+    bool Intersect(Vector2 myPosition, int myWidth, Vector2 otherPosition, int otherWidth);
 
     // 충돌 처리 함수.
     virtual void OnCollisionHit(Actor& other);
