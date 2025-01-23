@@ -88,6 +88,13 @@ Engine::~Engine()
     }
     delete[] imageBuffer;
 
+    // 순서 버퍼 삭제.
+    for (int ix = 0; ix < screenSize.x; ++ix)
+    {
+        delete orderBuffer[ix];
+    }
+    delete[] orderBuffer;
+
     // 화면 버퍼 삭제.
     for (int ix = 0; ix < BUFFER_SIZE; ++ix)
     {
