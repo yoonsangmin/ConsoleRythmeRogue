@@ -120,5 +120,8 @@ void Player::TakeDamage(int damage)
 {
     Super::TakeDamage(damage);
 
-    refLevel->PlayerDead();
+    if (hp <= 0)
+    {
+        refLevel->PlayerDead();
+    }
 }
