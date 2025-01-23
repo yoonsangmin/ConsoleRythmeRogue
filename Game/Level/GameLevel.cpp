@@ -115,16 +115,6 @@ void GameLevel::GameClear()
 void GameLevel::DrawBeatUI()
 {
     // 비트 표시하기.
-    //for (int y = beatScreen[0].y; y < beatScreen[1].y; ++y)
-    //{
-    //    int x = (int)(tickTimer / tickPerSecond * (beatScreen[1].x - 1) / 2);
-    //    int reverseX = beatScreen[1].x - 1 - x;
-
-    //    Engine::Get().Draw(Vector2(x, y), L"🎵");
-
-    //    Engine::Get().Draw(Vector2(reverseX, y), L"🎵");
-    //}
-
     int x = (int)(tickTimer / tickPerSecond * (beatScreen[1].x - 1) / 2);
     int y = beatScreen[0].y;
     int reverseX = beatScreen[1].x - 1 - x;
