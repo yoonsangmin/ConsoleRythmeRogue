@@ -63,6 +63,7 @@ class ScreenBuffer
 public:
     // 생성자에 크기만 전달하면, 새로운 콘솔 버퍼를 생성.
     ScreenBuffer(const COORD& size);
+    ScreenBuffer(HANDLE console, const COORD& size);
 
     // 소멸자.
     ~ScreenBuffer();

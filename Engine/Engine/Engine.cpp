@@ -56,7 +56,10 @@ Engine::Engine()
 
     // 두 개의 버퍼 생성 (버퍼를 번갈아 사용하기 위해-더블 버퍼링).
     COORD size = { (short)screenSize.x, (short)screenSize.y };
-    for (int ix = 0; ix < BUFFER_SIZE; ++ix)
+    renderTargets[0] = new ScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE), size);
+    renderTargets[0]->SetCursorType(CursorType::NoCursor);
+    renderTargets[0]->SetConsoleFontSize(30);
+    for (int ix = 1; ix < BUFFER_SIZE; ++ix)
     {
         renderTargets[ix] = new ScreenBuffer(size);
         renderTargets[ix]->SetCursorType(CursorType::NoCursor);
@@ -81,7 +84,7 @@ Engine::~Engine()
     // 클리어 버퍼 삭제.
     for (int ix = 0; ix < screenSize.x; ++ix)
     {
-        delete[] imageBuffer;
+        delete imageBuffer[ix];
     }
     delete[] imageBuffer;
 

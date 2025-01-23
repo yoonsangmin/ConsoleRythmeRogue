@@ -11,17 +11,29 @@ ScreenBuffer::ScreenBuffer(const COORD& size)
 	}
 
 	SetConsoleScreenBufferSize(buffer, size);
-	SMALL_RECT rect = { 0, 0, size.X - 1, size.Y - 1 };
+	SMALL_RECT rect = { 0, 0, size.X, size.Y };
 	SetConsoleWindowInfo(buffer, true, &rect);
+
+    horizontalBuffer = new CHAR_INFO[size.X * 2 + 2];
+}
+
+ScreenBuffer::ScreenBuffer(HANDLE console, const COORD& size)
+    : size(size), buffer(console)
+{
+    CONSOLE_SCREEN_BUFFER_INFOEX bufferInfo = {};
+    GetConsoleScreenBufferInfoEx(buffer, &bufferInfo);
+    bufferInfo.dwSize.X = size.X + 1;
+    bufferInfo.dwSize.Y = size.Y + 1;
+    SetConsoleScreenBufferInfoEx(buffer, &bufferInfo);
 
     horizontalBuffer = new CHAR_INFO[size.X * 2 + 2];
 }
 
 ScreenBuffer::~ScreenBuffer()
 {
-    CloseHandle(buffer);
-
     delete[] horizontalBuffer;
+
+    CloseHandle(buffer);
 }
 
 void ScreenBuffer::SetCursorType(CursorType cursorType)
