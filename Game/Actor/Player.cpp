@@ -90,7 +90,10 @@ void Player::Draw()
 {
     Super::Draw();
 
-    refLevel->GetMap()->CheckPlayerPosition(Position().x, Position().y);
+    if (Map* map = refLevel->GetMap())
+    {
+        map->CheckPlayerPosition(Position().x, Position().y);
+    }
 }
 
 void Player::OnCollisionHit(Actor& other)
