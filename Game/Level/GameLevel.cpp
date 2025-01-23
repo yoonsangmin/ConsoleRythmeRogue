@@ -85,6 +85,11 @@ void GameLevel::GoToNextLevel()
 
 void GameLevel::GenerateMap()
 {
+    if (map == nullptr)
+    {
+        return;
+    }
+
     map->ClearRooms();
     map->InitializeMap(gameScreen[0], gameScreen[1], 8, Vector2(20, 6));
 }
