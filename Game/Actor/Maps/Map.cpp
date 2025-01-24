@@ -279,7 +279,7 @@ void Map::CheckPlayerPosition(int x, int y)
     {
         // 맨해튼 거리.
         int distance = std::abs((object->Position().x - x) / 2) + std::abs(object->Position().y - y);
-        
+
         if (distance <= 1)
         {
             object->SetVisibility(true);
