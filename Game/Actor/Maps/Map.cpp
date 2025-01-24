@@ -258,23 +258,6 @@ void Map::SetVisibilityToRoom(bool value, int roomIndex)
 
 void Map::CheckPlayerPosition(int x, int y)
 {
-    for (int ix = 1; ix < roomActors.size(); ++ix)
-    {
-        for (auto& actor : roomActors[ix])
-        {
-            if (Floor* floor = actor->As<Floor>())
-            {
-                if (floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y - 1), 6) ||
-                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y), 4) ||
-                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y + 1), 6))
-                {
-                    SetVisibilityToRoom(true, ix);
-                    return;
-                }
-            }
-        }
-    }
-
     for (auto& object : objects)
     {
         // 맨해튼 거리.
@@ -294,6 +277,23 @@ void Map::CheckPlayerPosition(int x, int y)
         if (distance <= 1)
         {
             corridor->SetVisibility(true);
+        }
+    }
+
+    for (int ix = 1; ix < roomActors.size(); ++ix)
+    {
+        for (auto& actor : roomActors[ix])
+        {
+            if (Floor* floor = actor->As<Floor>())
+            {
+                if (floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y - 1), 6) ||
+                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y), 4) ||
+                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y + 1), 6))
+                {
+                    SetVisibilityToRoom(true, ix);
+                    return;
+                }
+            }
         }
     }
 }
