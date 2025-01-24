@@ -189,7 +189,7 @@ void Map::SpawnStair()
         }
     }
 
-    TrySpawnStairAt(x, x, rooms.Size() - 1);
+    TrySpawnStairAt(x, y, rooms.Size() - 1);
 }
 
 void Map::CreateEnemies(float enemySpawnCapability, int enemyMaxPerRoom)
