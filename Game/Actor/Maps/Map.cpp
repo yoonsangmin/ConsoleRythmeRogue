@@ -264,7 +264,9 @@ void Map::CheckPlayerPosition(int x, int y)
         {
             if (Floor* floor = actor->As<Floor>())
             {
-                if (floor->Position().x == x && floor->Position().y == y)
+                if (floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y - 1), 6) ||
+                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y), 4) ||
+                    floor->Intersect(floor->Position(), floor->Width(), Vector2(x - 2, y + 1), 6))
                 {
                     SetVisibilityToRoom(true, ix);
                     return;
@@ -277,7 +279,7 @@ void Map::CheckPlayerPosition(int x, int y)
     {
         // 맨해튼 거리.
         int distance = std::abs((object->Position().x - x) / 2) + std::abs(object->Position().y - y);
-
+        
         if (distance <= 1)
         {
             object->SetVisibility(true);
